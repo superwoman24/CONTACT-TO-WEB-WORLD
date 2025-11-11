@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Centered Editable & Movable Invitation Card</title>
+  <title>Editable & Movable Invitation Card</title>
   <link rel="icon" href="https://i.postimg.cc/DZRP5pxv/logo.png" type="image/png">
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700&display=swap" rel="stylesheet">
@@ -20,11 +20,12 @@
       padding: 20px;
     }
 
-    /* ✅ Centered Card */
+    /* ✅ Responsive Card */
     .card-container {
       position: relative;
-      width: 420px;
-      height: 594px;
+      width: 100%;
+      max-width: 420px;
+      aspect-ratio: 420 / 594;
       border-radius: 10px;
       box-shadow: 0 0 10px rgba(0,0,0,0.2);
       overflow: hidden;
@@ -35,7 +36,6 @@
       margin-bottom: 20px;
     }
 
-    /* ✅ Editable + Movable + Center-aligned text */
     .editable {
       position: absolute;
       cursor: move;
@@ -49,6 +49,7 @@
       outline: none;
       padding: 2px 6px;
       transition: background-color 0.2s;
+      word-wrap: break-word;
     }
 
     .editable:focus {
@@ -57,7 +58,8 @@
     }
 
     .controls {
-      width: 420px;
+      width: 100%;
+      max-width: 420px;
       display: flex;
       flex-direction: column;
       gap: 10px;
@@ -69,6 +71,8 @@
       border-radius: 5px;
       border: 1px solid #ccc;
       font-family: "Montserrat", sans-serif;
+      width: 100%;
+      box-sizing: border-box;
     }
 
     button {
@@ -83,18 +87,21 @@
     button:hover {
       background-color: #e55d4c;
     }
+
+    @media (max-width: 500px) {
+      .editable {
+        font-size: 14px;
+      }
+    }
   </style>
 </head>
 <body>
 
   <div class="card-container" id="card-container">
-
-    <!-- ✅ Editable + Movable Center Text -->
-    <div id="text1" class="editable" contenteditable="true" style="top: 185px; color: #E75480; font-size: 48px;">SNEHA'S</div>
-    <div id="text3" class="editable" contenteditable="true" style="top: 365px;">Date: 14th November 2025</div>
-    <div id="text4" class="editable" contenteditable="true" style="top: 400px;">Venue: <br>Akshay Lawns, Shirwal</div>
-    <div id="text5" class="editable" contenteditable="true" style="top: 460px;">With Patil Family</div>
-
+    <div id="text1" class="editable" contenteditable="true" style="top: 30%; color: #E75480; font-size: 40px;">SNEHA'S</div>
+    <div id="text3" class="editable" contenteditable="true" style="top: 65%;">Date: 14th November 2025</div>
+    <div id="text4" class="editable" contenteditable="true" style="top: 72%;">Venue:<br>Akshay Lawns, Shirwal</div>
+    <div id="text5" class="editable" contenteditable="true" style="top: 83%;">With Patil Family</div>
   </div>
 
   <div class="controls">
@@ -104,7 +111,7 @@
       <option value="https://i.postimg.cc/FHwCv1sd/BIRTHDAY-PARTY-1.jpg">Template 2</option>
     </select>
 
-    <button id="payButton" onclick="payNow()">Pay & Unlock Download</button>
+    <button id="payButton" onclick="payNow()">Pay ₹1 to Unlock Download</button>
     <button id="jpegButton" onclick="downloadCardAsJPEG()" disabled>Save as JPEG</button>
     <button id="pdfButton" onclick="downloadCardAsPDF()" disabled>Save as PDF</button>
   </div>
@@ -114,22 +121,25 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
 
   <script>
+    // ✅ Background Change
     function updateBackground() {
       const card = document.getElementById("card-container");
       card.style.backgroundImage = `url('${document.getElementById("template-selector").value}')`;
     }
 
+    // ✅ Payment Logic
     function payNow() {
       const options = {
-        key: "rzp_live_RcZiOkCgOaOkaW",
+        key: "rzp_live_RcZiOkCgOaOkaW", // Replace with your real key
         amount: 100,
         currency: "INR",
         name: "Invitation Card Payment",
-        description: "Pay to unlock download options",
+        description: "Pay ₹1 to unlock downloads",
         handler: function (response) {
-          alert("Payment Successful! Payment ID: " + response.razorpay_payment_id);
-          document.getElementById("jpegButton").disabled = false;
-          document.getElementById("pdfButton").disabled = false;
+          // No page reload
+          alert("✅ Payment Successful!\nPayment ID: " + response.razorpay_payment_id);
+          localStorage.setItem("downloadUnlocked", "true");
+          enableDownloads();
         },
         prefill: { name: "Guest User", email: "guest@example.com", contact: "9999999999" },
         theme: { color: "#F37254" }
@@ -138,14 +148,22 @@
       rzp.open();
     }
 
-    /* ✅ Editable + Movable + BOUNDARY LOCK logic */
+    // ✅ Unlock Downloads if previously paid (no refresh loss)
+    function enableDownloads() {
+      document.getElementById("jpegButton").disabled = false;
+      document.getElementById("pdfButton").disabled = false;
+    }
+
+    if (localStorage.getItem("downloadUnlocked") === "true") {
+      enableDownloads();
+    }
+
+    // ✅ Drag + Boundary Lock
     document.querySelectorAll('.editable').forEach(el => {
-      let isDragging = false;
-      let shiftX, shiftY;
+      let isDragging = false, shiftX, shiftY;
 
       el.addEventListener('mousedown', e => {
-        if (document.activeElement === el) return; // typing ke time drag disable
-
+        if (document.activeElement === el) return;
         isDragging = true;
         shiftX = e.clientX - el.getBoundingClientRect().left;
         shiftY = e.clientY - el.getBoundingClientRect().top;
@@ -157,11 +175,8 @@
           const elRect = el.getBoundingClientRect();
           const newLeft = pageX - shiftX - containerRect.left;
           const newTop = pageY - shiftY - containerRect.top;
-
-          // ✅ boundary lock logic
           const maxLeft = containerRect.width - elRect.width;
           const maxTop = containerRect.height - elRect.height;
-
           el.style.left = Math.max(0, Math.min(newLeft, maxLeft)) + 'px';
           el.style.top = Math.max(0, Math.min(newTop, maxTop)) + 'px';
         }
@@ -171,7 +186,6 @@
         }
 
         document.addEventListener('mousemove', onMouseMove);
-
         el.addEventListener('mouseup', () => {
           isDragging = false;
           document.removeEventListener('mousemove', onMouseMove);
@@ -181,7 +195,7 @@
       el.ondragstart = () => false;
     });
 
-    /* ✅ JPEG Download */
+    // ✅ JPEG Download
     function downloadCardAsJPEG() {
       html2canvas(document.getElementById("card-container"), { scale: 3, useCORS: true })
         .then(canvas => {
@@ -192,7 +206,7 @@
         });
     }
 
-    /* ✅ PDF Download */
+    // ✅ PDF Download
     function downloadCardAsPDF() {
       html2canvas(document.getElementById("card-container"), { scale: 3, useCORS: true })
         .then(canvas => {
