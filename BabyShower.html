@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Baby Shower Invitations</title>
+<link rel="icon" href="https://i.postimg.cc/DZRP5pxv/logo.png" type="image/png">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+
+<style>
+body {
+  font-family: 'Montserrat', sans-serif;
+  background: #f9f9fb;
+  margin: 0;
+  color: #333;
+}
+
+/* Header */
+header {
+  display: flex;
+  align-items: center;
+  background-color: #ff6f61;
+  color: white;
+  padding: 10px 20px;
+}
+header img { height: 40px; margin-right: 15px; }
+nav { display: flex; gap: 15px; flex-wrap: wrap; }
+nav a {
+  color: white;
+  text-decoration: none;
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: 5px;
+  transition: 0.3s;
+}
+nav a:hover { background: rgba(255,255,255,0.2); }
+
+/* Container */
+.container { max-width: 1200px; margin: auto; padding: 30px; }
+h1 { text-align: center; margin-bottom: 25px; color: #444; }
+
+/* Card Grid */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 25px;
+}
+
+/* Each Card */
+.invitation-card {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+  text-align: center;
+  transition: transform 0.3s;
+  padding: 12px;
+}
+.invitation-card:hover { transform: scale(1.03); }
+
+/* A4 Preview Box */
+.a4-preview {
+  width: 100%;
+  aspect-ratio: 210 / 297; /* A4 size ratio */
+  background: #f0f0f0;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.a4-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Text & Button */
+.invitation-card h3 {
+  margin: 12px 0;
+  color: #222;
+  font-size: 1rem;
+}
+
+.edit-btn {
+  background-color: #ff6f61;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.3s;
+}
+.edit-btn:hover { background-color: #e55d4c; }
+
+/* Footer */
+footer {
+  background: #ff6f61;
+  color: white;
+  text-align: center;
+  padding: 12px 0;
+  margin-top: 40px;
+  font-size: 0.9rem;
+}
+
+@media (max-width: 600px) {
+  header { flex-direction: column; align-items: flex-start; }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <img src="https://i.postimg.cc/DZRP5pxv/logo.png" alt="Logo">
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="wedding.html">Wedding</a>
+    <a href="birthday.html">Birthday</a>
+    <a href="babyshower.html">Baby Shower</a>
+    <a href="housewarming.html">House Warming</a>
+  </nav>
+</header>
+
+<div class="container">
+  <h1>Wedding Invitation Templates</h1>
+  <div class="card-grid">
+
+    <div class="invitation-card">
+      <div class="a4-preview">
+        <img src="https://i.postimg.cc/hGkM2K8x/BIRTHDAY-PARTY.jpg" alt="Wedding Card 1">
+      </div>
+      <h3>Baby Shower Card 1</h3>
+      <button class="edit-btn" onclick="location.href='editor.html'">Edit</button>
+    </div>
+
+    <div class="invitation-card">
+      <div class="a4-preview">
+        <img src="https://i.imgur.com/NMcwMc7.jpeg" alt="Wedding Card 2">
+      </div>
+      <h3>Baby Shower Card 2</h3>
+      <button class="edit-btn" onclick="location.href='editor.html'">Edit</button>
+    </div>
+
+    <div class="invitation-card">
+      <div class="a4-preview">
+        <img src="https://i.imgur.com/ovQ1IyW.jpeg" alt="Wedding Card 3">
+      </div>
+      <h3>Baby Shower Card 3</h3>
+      <button class="edit-btn" onclick="location.href='editor.html'">Edit</button>
+    </div>
+
+    <div class="invitation-card">
+      <div class="a4-preview">
+        <img src="https://i.imgur.com/qokGmKo.jpeg" alt="Wedding Card 4">
+      </div>
+      <h3>Baby Shower Card 4</h3>
+      <button class="edit-btn" onclick="location.href='editor.html'">Edit</button>
+    </div>
+
+    <div class="invitation-card">
+      <div class="a4-preview">
+        <img src="https://i.imgur.com/V0Z8v7M.png" alt="Wedding Card 5">
+      </div>
+      <h3>Baby Shower Card 5</h3>
+      <button class="edit-btn" onclick="location.href='editor.html'">Edit</button>
+    </div>
+
+  </div>
+</div>
+
+<footer>
+  © 2025 Invitation World | Designed by Puja
+</footer>
+
+</body>
+</html>
