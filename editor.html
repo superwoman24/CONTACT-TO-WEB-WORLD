@@ -14,7 +14,228 @@
       font-family: "Montserrat", sans-serif;
       background-color: #f7f8fa;
       display: flex;
+      flex-direction: column;<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Editable & Movable Invitation Card</title>
+  <link rel="icon" href="https://i.postimg.cc/DZRP5pxv/logo.png" type="image/png">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700&display=swap" rel="stylesheet">
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: "Montserrat", sans-serif;
+      background-color: #f7f8fa;
+      display: flex;
       flex-direction: column;
+      align-items: center;
+      padding: 20px;
+    }
+
+    /* ✅ Responsive Card */
+    .card-container {
+      position: relative;
+      width: 100%;
+      max-width: 420px;
+      aspect-ratio: 420 / 594;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.2);
+      overflow: hidden;
+      background-image: url("https://i.postimg.cc/hGkM2K8x/BIRTHDAY-PARTY.jpg");
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      margin-bottom: 20px;
+    }
+
+    .editable {
+      position: absolute;
+      cursor: move;
+      user-select: text;
+      width: 100%;
+      text-align: center;
+      color: #E75480;
+      font-size: 16px;
+      font-weight: bold;
+      font-family: 'Poppins', cursive;
+      outline: none;
+      padding: 2px 6px;
+      transition: background-color 0.2s;
+      word-wrap: break-word;
+    }
+
+    .editable:focus {
+      background-color: rgba(255, 255, 255, 0.2);
+      cursor: text;
+    }
+
+    .controls {
+      width: 100%;
+      max-width: 420px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    select, button {
+      padding: 10px;
+      font-size: 14px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      font-family: "Montserrat", sans-serif;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    button {
+      background-color: #ff6f61;
+      color: white;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      background-color: #e55d4c;
+    }
+
+    @media (max-width: 500px) {
+      .editable {
+        font-size: 14px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="card-container" id="card-container">
+    <div id="text1" class="editable" contenteditable="true" style="top: 30%; color: #E75480; font-size: 40px;">SNEHA'S</div>
+    <div id="text3" class="editable" contenteditable="true" style="top: 65%;">Date: 14th November 2025</div>
+    <div id="text4" class="editable" contenteditable="true" style="top: 72%;">Venue:<br>Akshay Lawns, Shirwal</div>
+    <div id="text5" class="editable" contenteditable="true" style="top: 83%;">With Patil Family</div>
+  </div>
+
+  <div class="controls">
+    <label>Choose Background:</label>
+    <select id="template-selector" onchange="updateBackground()">
+      <option value="https://i.postimg.cc/jjwV6GCk/BIRTHDAY-PARTY.jpg">Template 1</option>
+      <option value="https://i.postimg.cc/FHwCv1sd/BIRTHDAY-PARTY-1.jpg">Template 2</option>
+    </select>
+
+    <button id="payButton" onclick="payNow()">Pay ₹1 to Unlock Download</button>
+    <button id="jpegButton" onclick="downloadCardAsJPEG()" disabled>Save as JPEG</button>
+    <button id="pdfButton" onclick="downloadCardAsPDF()" disabled>Save as PDF</button>
+  </div>
+
+  <!-- Libraries -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+
+  <script>
+    // ✅ Background Change
+    function updateBackground() {
+      const card = document.getElementById("card-container");
+      card.style.backgroundImage = `url('${document.getElementById("template-selector").value}')`;
+    }
+
+    // ✅ Payment Logic
+    function payNow() {
+      const options = {
+        key: "rzp_test_123456789", // Replace with your real key
+        amount: 100,
+        currency: "INR",
+        name: "Invitation Card Payment",
+        description: "Pay ₹1 to unlock downloads",
+        handler: function (response) {
+          // No page reload
+          alert("✅ Payment Successful!\nPayment ID: " + response.razorpay_payment_id);
+          localStorage.setItem("downloadUnlocked", "true");
+          enableDownloads();
+        },
+        prefill: { name: "Guest User", email: "guest@example.com", contact: "9999999999" },
+        theme: { color: "#F37254" }
+      };
+      const rzp = new Razorpay(options);
+      rzp.open();
+    }
+
+    // ✅ Unlock Downloads if previously paid (no refresh loss)
+    function enableDownloads() {
+      document.getElementById("jpegButton").disabled = false;
+      document.getElementById("pdfButton").disabled = false;
+    }
+
+    if (localStorage.getItem("downloadUnlocked") === "true") {
+      enableDownloads();
+    }
+
+    // ✅ Drag + Boundary Lock
+    document.querySelectorAll('.editable').forEach(el => {
+      let isDragging = false, shiftX, shiftY;
+
+      el.addEventListener('mousedown', e => {
+        if (document.activeElement === el) return;
+        isDragging = true;
+        shiftX = e.clientX - el.getBoundingClientRect().left;
+        shiftY = e.clientY - el.getBoundingClientRect().top;
+
+        const container = document.getElementById("card-container");
+        const containerRect = container.getBoundingClientRect();
+
+        function moveAt(pageX, pageY) {
+          const elRect = el.getBoundingClientRect();
+          const newLeft = pageX - shiftX - containerRect.left;
+          const newTop = pageY - shiftY - containerRect.top;
+          const maxLeft = containerRect.width - elRect.width;
+          const maxTop = containerRect.height - elRect.height;
+          el.style.left = Math.max(0, Math.min(newLeft, maxLeft)) + 'px';
+          el.style.top = Math.max(0, Math.min(newTop, maxTop)) + 'px';
+        }
+
+        function onMouseMove(e) {
+          if (isDragging) moveAt(e.pageX, e.pageY);
+        }
+
+        document.addEventListener('mousemove', onMouseMove);
+        el.addEventListener('mouseup', () => {
+          isDragging = false;
+          document.removeEventListener('mousemove', onMouseMove);
+        }, { once: true });
+      });
+
+      el.ondragstart = () => false;
+    });
+
+    // ✅ JPEG Download
+    function downloadCardAsJPEG() {
+      html2canvas(document.getElementById("card-container"), { scale: 3, useCORS: true })
+        .then(canvas => {
+          const link = document.createElement("a");
+          link.download = "invitation-card.jpg";
+          link.href = canvas.toDataURL("image/jpeg", 1.0);
+          link.click();
+        });
+    }
+
+    // ✅ PDF Download
+    function downloadCardAsPDF() {
+      html2canvas(document.getElementById("card-container"), { scale: 3, useCORS: true })
+        .then(canvas => {
+          const pdf = new jspdf.jsPDF({ orientation: "portrait", unit: "mm", format: [210, 297] });
+          const imgData = canvas.toDataURL("image/jpeg", 1.0);
+          pdf.addImage(imgData, "JPEG", 0, 0, 210, 297);
+          pdf.save("invitation-card.pdf");
+        });
+    }
+  </script>
+</body>
+</html>
+
       align-items: center;
       padding: 20px;
     }
@@ -232,3 +453,4 @@
 </script>
 </body>
 </html>
+
