@@ -81,14 +81,17 @@
       transition: 0.3s;
     }
 
-    button:hover {
+    button:hover:enabled {
       background-color: #e55d4c;
     }
 
+    button:disabled {
+      background-color: #ccc;
+      cursor: not-allowed;
+    }
+
     @media (max-width: 500px) {
-      .editable {
-        font-size: 14px;
-      }
+      .editable { font-size: 14px; }
     }
   </style>
 </head>
@@ -113,7 +116,6 @@
     <button id="pdfButton" onclick="downloadCardAsPDF()" disabled>Save as PDF</button>
   </div>
 
-  <!-- Libraries -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
 
@@ -125,14 +127,14 @@
     card.style.backgroundImage = `url('${selected}')`;
   }
 
-  // ✅ Payment Unlock (Razorpay)
+  // ✅ Razorpay Payment
   function payNow() {
     const options = {
-      key: "rzp_live_RcZiOkCgOaOkaW", // ⚠️ Replace with your real key in production
-      amount: 100,
+      key: "rzp_live_RcZiOkCgOaOkaW", // ⚠️ Replace with your own Razorpay key
+      amount: 100, // ₹1 = 100 paise
       currency: "INR",
-      name: "Invitation Card Payment",
-      description: "Pay ₹1 to unlock downloads",
+      name: "Invitation Card Unlock",
+      description: "Pay ₹1 to unlock download buttons",
       handler: function (response) {
         alert("✅ Payment Successful!\nPayment ID: " + response.razorpay_payment_id);
         localStorage.setItem("downloadUnlocked", "true");
@@ -145,16 +147,20 @@
     rzp.open();
   }
 
+  // ✅ Unlock Download Buttons
   function enableDownloads() {
     document.getElementById("jpegButton").disabled = false;
     document.getElementById("pdfButton").disabled = false;
+    document.getElementById("payButton").innerText = "Payment Completed ✅";
+    document.getElementById("payButton").disabled = true;
   }
 
+  // Auto-unlock if already paid
   if (localStorage.getItem("downloadUnlocked") === "true") {
     enableDownloads();
   }
 
-  // ✅ Make Editable Text Movable (Desktop + Mobile)
+  // ✅ Editable Text Move (Desktop + Mobile)
   document.querySelectorAll('.editable').forEach(el => {
     let isDragging = false, shiftX, shiftY;
 
@@ -183,12 +189,10 @@
 
     function stopDrag() { isDragging = false; }
 
-    // Desktop Events
     el.addEventListener('mousedown', e => startDrag(e.clientX, e.clientY));
     document.addEventListener('mousemove', e => { if (isDragging) moveAt(e.clientX, e.clientY); });
     document.addEventListener('mouseup', stopDrag);
 
-    // Mobile Touch Events
     el.addEventListener('touchstart', e => {
       const touch = e.touches[0];
       startDrag(touch.clientX, touch.clientY);
@@ -204,7 +208,7 @@
     el.ondragstart = () => false;
   });
 
-  // ✅ Save as JPEG
+  // ✅ Download as JPEG
   function downloadCardAsJPEG() {
     html2canvas(document.getElementById("card-container"), { scale: 3, useCORS: true })
       .then(canvas => {
@@ -215,14 +219,13 @@
       });
   }
 
-  // ✅ Save as PDF
+  // ✅ Download as PDF
   function downloadCardAsPDF() {
     html2canvas(document.getElementById("card-container"), { scale: 3, useCORS: true })
       .then(canvas => {
         const pdf = new jspdf.jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
         const imgData = canvas.toDataURL("image/jpeg", 1.0);
-        const width = 210, height = 297;
-        pdf.addImage(imgData, "JPEG", 0, 0, width, height);
+        pdf.addImage(imgData, "JPEG", 0, 0, 210, 297);
         pdf.save("invitation-card.pdf");
       });
   }
