@@ -5,8 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Editable & Movable Invitation Card</title>
   <link rel="icon" href="https://i.postimg.cc/DZRP5pxv/logo.png" type="image/png">
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Poppins:wght@700&display=swap" rel="stylesheet">
   <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
   <style>
@@ -20,7 +19,6 @@
       padding: 20px;
     }
 
-    /* ✅ Responsive Card */
     .card-container {
       position: relative;
       width: 100%;
@@ -32,7 +30,6 @@
       background-image: url("https://i.postimg.cc/hGkM2K8x/BIRTHDAY-PARTY.jpg");
       background-size: cover;
       background-position: center;
-      background-repeat: no-repeat;
       margin-bottom: 20px;
     }
 
@@ -98,7 +95,7 @@
 <body>
 
   <div class="card-container" id="card-container">
-    <div id="text1" class="editable" contenteditable="true" style="top: 30%; color: #E75480; font-size: 40px;">SNEHA'S</div>
+    <div id="text1" class="editable" contenteditable="true" style="top: 30%; font-size: 40px;">SNEHA'S</div>
     <div id="text3" class="editable" contenteditable="true" style="top: 65%;">Date: 14th November 2025</div>
     <div id="text4" class="editable" contenteditable="true" style="top: 72%;">Venue:<br>Akshay Lawns, Shirwal</div>
     <div id="text5" class="editable" contenteditable="true" style="top: 83%;">With Patil Family</div>
@@ -121,14 +118,17 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
 
 <script>
+  // ✅ Change Background
   function updateBackground() {
     const card = document.getElementById("card-container");
-    card.style.backgroundImage = `url('${document.getElementById("template-selector").value}')`;
+    const selected = document.getElementById("template-selector").value;
+    card.style.backgroundImage = `url('${selected}')`;
   }
 
+  // ✅ Payment Unlock (Razorpay)
   function payNow() {
     const options = {
-      key: "rzp_live_RcZiOkCgOaOkaW", // <-- Replace with your real Razorpay key
+      key: "rzp_live_RcZiOkCgOaOkaW", // ⚠️ Replace with your real key in production
       amount: 100,
       currency: "INR",
       name: "Invitation Card Payment",
@@ -154,13 +154,12 @@
     enableDownloads();
   }
 
-  // ✅ Editable Text Move (Desktop + Mobile)
+  // ✅ Make Editable Text Movable (Desktop + Mobile)
   document.querySelectorAll('.editable').forEach(el => {
-    let isDragging = false;
-    let shiftX, shiftY;
+    let isDragging = false, shiftX, shiftY;
 
     function startDrag(x, y) {
-      if (document.activeElement === el) return; // typing ke time disable
+      if (document.activeElement === el) return;
       isDragging = true;
       const rect = el.getBoundingClientRect();
       shiftX = x - rect.left;
@@ -172,8 +171,9 @@
       const containerRect = container.getBoundingClientRect();
       const elRect = el.getBoundingClientRect();
 
-      const newLeft = x - shiftX - containerRect.left;
-      const newTop = y - shiftY - containerRect.top;
+      let newLeft = x - shiftX - containerRect.left;
+      let newTop = y - shiftY - containerRect.top;
+
       const maxLeft = containerRect.width - elRect.width;
       const maxTop = containerRect.height - elRect.height;
 
@@ -181,18 +181,14 @@
       el.style.top = Math.max(0, Math.min(newTop, maxTop)) + 'px';
     }
 
-    function stopDrag() {
-      isDragging = false;
-    }
+    function stopDrag() { isDragging = false; }
 
-    // 🖱 Desktop Events
+    // Desktop Events
     el.addEventListener('mousedown', e => startDrag(e.clientX, e.clientY));
-    document.addEventListener('mousemove', e => {
-      if (isDragging) moveAt(e.clientX, e.clientY);
-    });
+    document.addEventListener('mousemove', e => { if (isDragging) moveAt(e.clientX, e.clientY); });
     document.addEventListener('mouseup', stopDrag);
 
-    // 📱 Mobile Touch Events
+    // Mobile Touch Events
     el.addEventListener('touchstart', e => {
       const touch = e.touches[0];
       startDrag(touch.clientX, touch.clientY);
@@ -205,11 +201,10 @@
     }, { passive: true });
 
     el.addEventListener('touchend', stopDrag);
-
     el.ondragstart = () => false;
   });
 
-  // ✅ JPEG Download
+  // ✅ Save as JPEG
   function downloadCardAsJPEG() {
     html2canvas(document.getElementById("card-container"), { scale: 3, useCORS: true })
       .then(canvas => {
@@ -220,18 +215,17 @@
       });
   }
 
-  // ✅ PDF Download
+  // ✅ Save as PDF
   function downloadCardAsPDF() {
     html2canvas(document.getElementById("card-container"), { scale: 3, useCORS: true })
       .then(canvas => {
-        const pdf = new jspdf.jsPDF({ orientation: "portrait", unit: "mm", format: [210, 297] });
+        const pdf = new jspdf.jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
         const imgData = canvas.toDataURL("image/jpeg", 1.0);
-        pdf.addImage(imgData, "JPEG", 0, 0, 210, 297);
+        const width = 210, height = 297;
+        pdf.addImage(imgData, "JPEG", 0, 0, width, height);
         pdf.save("invitation-card.pdf");
       });
   }
 </script>
 </body>
 </html>
-
-
