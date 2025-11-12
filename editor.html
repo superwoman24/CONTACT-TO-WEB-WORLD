@@ -115,40 +115,45 @@
     <button id="pdfButton" onclick="downloadCardAsPDF()" disabled>Save as PDF</button>
   </div>
 
-  <!-- Libraries -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
 
   <script>
+    // ✅ Background change
     function updateBackground() {
       const card = document.getElementById("card-container");
       card.style.backgroundImage = `url('${document.getElementById("template-selector").value}')`;
     }
 
-    async function payNow() {
+    // ✅ Payment
+    function payNow() {
       const options = {
-        key: "rzp_live_RcZiOkCgOaOkaW", // your Razorpay key
+        key: "rzp_live_RcZiOkCgOaOkaW",
         amount: 100,
         currency: "INR",
         name: "Invitation Card Payment",
-        description: "Pay ₹1 to unlock and auto-download",
-        handler: async function (response) {
+        description: "Pay ₹1 to unlock downloads",
+        handler: function (response) {
+          // payment confirmed only here
+          alert("✅ Payment Successful! Files will download shortly.");
           localStorage.setItem("downloadUnlocked", "true");
           enableDownloads();
-          alert("✅ Payment Successful! Downloads will start automatically.");
 
-          // Give browser time to finish Razorpay process
-          setTimeout(async () => {
-            await autoDownload();
-          }, 800);
+          // delay ensures Razorpay popup fully closes
+          setTimeout(() => {
+            downloadCardAsJPEG();
+            setTimeout(downloadCardAsPDF, 1500);
+          }, 1000);
         },
         prefill: { name: "Guest User", email: "guest@example.com", contact: "9999999999" },
         theme: { color: "#F37254" }
       };
+
       const rzp = new Razorpay(options);
       rzp.open();
     }
 
+    // ✅ enable download buttons
     function enableDownloads() {
       document.getElementById("jpegButton").disabled = false;
       document.getElementById("pdfButton").disabled = false;
@@ -158,47 +163,38 @@
       enableDownloads();
     }
 
-    async function autoDownload() {
-      await downloadCardAsJPEG();
-      setTimeout(downloadCardAsPDF, 1500); // Small delay for stability
-    }
-
-    // ✅ Drag with touch support
+    // ✅ touch + mouse drag
     document.querySelectorAll('.editable').forEach(el => {
       let isDragging = false, shiftX, shiftY;
 
-      function startDrag(e) {
+      const start = e => {
         if (document.activeElement === el) return;
         isDragging = true;
+        const point = e.touches ? e.touches[0] : e;
+        shiftX = point.clientX - el.getBoundingClientRect().left;
+        shiftY = point.clientY - el.getBoundingClientRect().top;
+      };
 
-        const touch = e.touches ? e.touches[0] : e;
-        shiftX = touch.clientX - el.getBoundingClientRect().left;
-        shiftY = touch.clientY - el.getBoundingClientRect().top;
-      }
-
-      function moveDrag(e) {
+      const move = e => {
         if (!isDragging) return;
-        const touch = e.touches ? e.touches[0] : e;
+        const point = e.touches ? e.touches[0] : e;
         const container = document.getElementById("card-container");
         const rect = container.getBoundingClientRect();
         const elRect = el.getBoundingClientRect();
-        const left = Math.max(0, Math.min(touch.clientX - shiftX - rect.left, rect.width - elRect.width));
-        const top = Math.max(0, Math.min(touch.clientY - shiftY - rect.top, rect.height - elRect.height));
-        el.style.left = left + "px";
-        el.style.top = top + "px";
-      }
+        const newLeft = Math.max(0, Math.min(point.clientX - shiftX - rect.left, rect.width - elRect.width));
+        const newTop = Math.max(0, Math.min(point.clientY - shiftY - rect.top, rect.height - elRect.height));
+        el.style.left = newLeft + "px";
+        el.style.top = newTop + "px";
+      };
 
-      function endDrag() {
-        isDragging = false;
-      }
+      const end = () => { isDragging = false; };
 
-      el.addEventListener("mousedown", startDrag);
-      el.addEventListener("mousemove", moveDrag);
-      el.addEventListener("mouseup", endDrag);
-
-      el.addEventListener("touchstart", startDrag);
-      el.addEventListener("touchmove", moveDrag);
-      el.addEventListener("touchend", endDrag);
+      el.addEventListener("mousedown", start);
+      el.addEventListener("mousemove", move);
+      el.addEventListener("mouseup", end);
+      el.addEventListener("touchstart", start);
+      el.addEventListener("touchmove", move);
+      el.addEventListener("touchend", end);
     });
 
     // ✅ JPEG Download
