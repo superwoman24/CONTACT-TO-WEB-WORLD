@@ -3,216 +3,110 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Editable & Movable Invitation Card</title>
+  <title>Payment Unlock Download</title>
   <link rel="icon" href="https://i.postimg.cc/DZRP5pxv/logo.png" type="image/png">
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700&display=swap" rel="stylesheet">
-  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-
   <style>
     body {
-      margin: 0;
-      font-family: "Montserrat", sans-serif;
-      background-color: #f7f8fa;
+      font-family: 'Poppins', sans-serif;
       display: flex;
       flex-direction: column;
       align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+      background: #f4f4f4;
+    }
+
+    .container {
+      background: #fff;
+      border-radius: 15px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
       padding: 20px;
-    }
-
-    .card-container {
-      position: relative;
-      width: 100%;
-      max-width: 420px;
-      aspect-ratio: 420 / 594;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.2);
-      overflow: hidden;
-      background-image: url("https://i.postimg.cc/hGkM2K8x/BIRTHDAY-PARTY.jpg");
-      background-size: cover;
-      background-position: center;
-      background-repeat: no-repeat;
-      margin-bottom: 20px;
-    }
-
-    .editable {
-      position: absolute;
-      cursor: move;
-      user-select: text;
-      width: 100%;
+      width: 90%;
+      max-width: 400px;
       text-align: center;
-      color: #E75480;
-      font-size: 16px;
-      font-weight: bold;
-      font-family: 'Poppins', cursive;
-      outline: none;
-      padding: 2px 6px;
-      transition: background-color 0.2s;
-      word-wrap: break-word;
-    }
-
-    .editable:focus {
-      background-color: rgba(255, 255, 255, 0.2);
-      cursor: text;
-    }
-
-    .controls {
-      width: 100%;
-      max-width: 420px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    select, button {
-      padding: 10px;
-      font-size: 14px;
-      border-radius: 5px;
-      border: 1px solid #ccc;
-      font-family: "Montserrat", sans-serif;
-      width: 100%;
-      box-sizing: border-box;
     }
 
     button {
-      background-color: #ff6f61;
-      color: white;
-      font-weight: 600;
+      display: block;
+      width: 100%;
+      padding: 12px;
       border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: 600;
       cursor: pointer;
+      margin-top: 15px;
       transition: 0.3s;
     }
 
-    button:hover {
-      background-color: #e55d4c;
+    #payBtn {
+      background-color: #ff4d6d;
+      color: white;
     }
 
-    @media (max-width: 500px) {
-      .editable {
-        font-size: 14px;
+    #downloadBtn {
+      background-color: #4CAF50;
+      color: white;
+      opacity: 0.5;
+      pointer-events: none;
+    }
+
+    @media (max-width: 600px) {
+      .container {
+        padding: 15px;
+      }
+      button {
+        font-size: 15px;
       }
     }
   </style>
 </head>
 <body>
-
-  <div class="card-container" id="card-container">
-    <div id="text1" class="editable" contenteditable="true" style="top: 30%; color: #E75480; font-size: 40px;">SNEHA'S</div>
-    <div id="text3" class="editable" contenteditable="true" style="top: 65%;">Date: 14th November 2025</div>
-    <div id="text4" class="editable" contenteditable="true" style="top: 72%;">Venue:<br>Akshay Lawns, Shirwal</div>
-    <div id="text5" class="editable" contenteditable="true" style="top: 83%;">With Patil Family</div>
+  <div class="container">
+    <h2>Complete Payment to Unlock Download</h2>
+    <button id="payBtn">Pay ₹10</button>
+    <button id="downloadBtn">Download File</button>
   </div>
-
-  <div class="controls">
-    <label>Choose Background:</label>
-    <select id="template-selector" onchange="updateBackground()">
-      <option value="https://i.postimg.cc/jjwV6GCk/BIRTHDAY-PARTY.jpg">Template 1</option>
-      <option value="https://i.postimg.cc/FHwCv1sd/BIRTHDAY-PARTY-1.jpg">Template 2</option>
-    </select>
-
-    <button id="payButton" onclick="payNow()">Pay ₹1 to Unlock & Download</button>
-    <button id="jpegButton" onclick="downloadCardAsJPEG()" disabled>Save as JPEG</button>
-    <button id="pdfButton" onclick="downloadCardAsPDF()" disabled>Save as PDF</button>
-  </div>
-
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
 
   <script>
-    // ✅ Background change
-    function updateBackground() {
-      const card = document.getElementById("card-container");
-      card.style.backgroundImage = `url('${document.getElementById("template-selector").value}')`;
-    }
+    const payBtn = document.getElementById('payBtn');
+    const downloadBtn = document.getElementById('downloadBtn');
 
-    // ✅ Payment
-    function payNow() {
-      const options = {
-        key: "rzp_live_RcZiOkCgOaOkaW",
-        amount: 100,
-        currency: "INR",
-        name: "Invitation Card Payment",
-        description: "Pay ₹1 to unlock downloads",
-        handler: function (response) {
-          // payment confirmed only here
-          alert("✅ Payment Successful! Files will download shortly.");
-          localStorage.setItem("downloadUnlocked", "true");
-          enableDownloads();
+    // Simulated payment gateway
+    payBtn.addEventListener('click', () => {
+      payBtn.innerText = "Processing...";
+      payBtn.disabled = true;
 
-          // delay ensures Razorpay popup fully closes
-          setTimeout(() => {
-            downloadCardAsJPEG();
-            setTimeout(downloadCardAsPDF, 1500);
-          }, 1000);
-        },
-        prefill: { name: "Guest User", email: "guest@example.com", contact: "9999999999" },
-        theme: { color: "#F37254" }
-      };
-
-      const rzp = new Razorpay(options);
-      rzp.open();
-    }
-
-    // ✅ enable download buttons
-    function enableDownloads() {
-      document.getElementById("jpegButton").disabled = false;
-      document.getElementById("pdfButton").disabled = false;
-    }
-
-    if (localStorage.getItem("downloadUnlocked") === "true") {
-      enableDownloads();
-    }
-
-    // ✅ touch + mouse drag
-    document.querySelectorAll('.editable').forEach(el => {
-      let isDragging = false, shiftX, shiftY;
-
-      const start = e => {
-        if (document.activeElement === el) return;
-        isDragging = true;
-        const point = e.touches ? e.touches[0] : e;
-        shiftX = point.clientX - el.getBoundingClientRect().left;
-        shiftY = point.clientY - el.getBoundingClientRect().top;
-      };
-
-      const move = e => {
-        if (!isDragging) return;
-        const point = e.touches ? e.touches[0] : e;
-        const container = document.getElementById("card-container");
-        const rect = container.getBoundingClientRect();
-        const elRect = el.getBoundingClientRect();
-        const newLeft = Math.max(0, Math.min(point.clientX - shiftX - rect.left, rect.width - elRect.width));
-        const newTop = Math.max(0, Math.min(point.clientY - shiftY - rect.top, rect.height - elRect.height));
-        el.style.left = newLeft + "px";
-        el.style.top = newTop + "px";
-      };
-
-      const end = () => { isDragging = false; };
-
-      el.addEventListener("mousedown", start);
-      el.addEventListener("mousemove", move);
-      el.addEventListener("mouseup", end);
-      el.addEventListener("touchstart", start);
-      el.addEventListener("touchmove", move);
-      el.addEventListener("touchend", end);
+      // Simulate payment delay (e.g., waiting for Razorpay or Stripe callback)
+      setTimeout(() => {
+        // Payment successful
+        alert("✅ Payment Successful!");
+        unlockDownload();
+      }, 3000);
     });
 
-    // ✅ JPEG Download
-    async function downloadCardAsJPEG() {
-      const canvas = await html2canvas(document.getElementById("card-container"), { scale: 3, useCORS: true });
-      const link = document.createElement("a");
-      link.download = "invitation-card.jpg";
-      link.href = canvas.toDataURL("image/jpeg", 1.0);
-      link.click();
+    function unlockDownload() {
+      downloadBtn.style.opacity = "1";
+      downloadBtn.style.pointerEvents = "auto";
+      payBtn.innerText = "Payment Done";
+      payBtn.disabled = true;
+
+      // For mobile browsers, add a delay before enabling click
+      setTimeout(() => {
+        downloadBtn.addEventListener('click', () => {
+          downloadFile();
+        });
+      }, 500);
     }
 
-    // ✅ PDF Download
-    async function downloadCardAsPDF() {
-      const canvas = await html2canvas(document.getElementById("card-container"), { scale: 3, useCORS: true });
-      const pdf = new jspdf.jsPDF({ orientation: "portrait", unit: "mm", format: [210, 297] });
-      const imgData = canvas.toDataURL("image/jpeg", 1.0);
-      pdf.addImage(imgData, "JPEG", 0, 0, 210, 297);
-      pdf.save("invitation-card.pdf");
+    function downloadFile() {
+      const link = document.createElement('a');
+      link.href = 'https://example.com/sample.pdf'; // <-- Replace with your file URL
+      link.download = 'InvitationCard.pdf';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
     }
   </script>
 </body>
