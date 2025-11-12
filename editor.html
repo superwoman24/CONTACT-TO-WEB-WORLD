@@ -11,6 +11,11 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
   <style>
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
     body {
       margin: 0;
       background: #f5f5f5;
@@ -20,17 +25,19 @@
       align-items: center;
       justify-content: center;
       min-height: 100vh;
+      overflow-x: hidden;
     }
 
     .card-container {
       position: relative;
       width: 90vw;
-      max-width: 400px;
-      aspect-ratio: 1 / 1.414;
+      max-width: 420px;
+      aspect-ratio: 1 / 1.414; /* A4 ratio */
       border-radius: 12px;
       overflow: hidden;
-      box-shadow: 0 0 12px rgba(0,0,0,0.2);
+      box-shadow: 0 0 12px rgba(0, 0, 0, 0.2);
       background: white;
+      touch-action: none;
     }
 
     .card {
@@ -44,17 +51,20 @@
     .editable {
       position: absolute;
       color: #E75480;
-      font-size: 16px;
+      font-size: clamp(14px, 3vw, 28px);
       text-align: center;
       cursor: text;
       user-select: text;
       outline: none;
-      padding: 2px 5px;
+      padding: 3px 6px;
+      word-break: break-word;
+      touch-action: none;
     }
 
     .controls {
       margin-top: 15px;
       display: flex;
+      flex-wrap: wrap;
       gap: 10px;
       justify-content: center;
     }
@@ -68,6 +78,7 @@
       font-weight: bold;
       cursor: pointer;
       transition: 0.3s;
+      font-size: 1rem;
     }
 
     button:hover {
@@ -78,6 +89,17 @@
       background: gray;
       cursor: not-allowed;
     }
+
+    @media (max-width: 480px) {
+      .controls {
+        flex-direction: column;
+        width: 90%;
+      }
+
+      button {
+        width: 100%;
+      }
+    }
   </style>
 </head>
 <body>
@@ -86,22 +108,22 @@
     <img src="https://i.postimg.cc/jjwV6GCk/BIRTHDAY-PARTY.jpg" alt="Invitation Template" class="card">
 
     <div id="text1" class="editable" contenteditable="true"
-         style="top: 170px; left: 50%; transform: translateX(-50%); font-size: 48px;">
+      style="top: 20%; left: 50%; transform: translateX(-50%); font-size: clamp(24px, 6vw, 48px);">
       SNEHA'S
     </div>
 
     <div id="text2" class="editable" contenteditable="true"
-         style="top: 340px; left: 50%; transform: translateX(-50%);">
-      DATE : 11 NOV.2025<br>TIME : 8PM
+      style="top: 40%; left: 50%; transform: translateX(-50%);">
+      DATE : 11 NOV. 2025<br>TIME : 8PM
     </div>
 
     <div id="text3" class="editable" contenteditable="true"
-         style="top: 400px; left: 50%; transform: translateX(-50%);">
+      style="top: 50%; left: 50%; transform: translateX(-50%);">
       VENUE : SUKANYA HALL MUMBAI
     </div>
 
     <div id="text4" class="editable" contenteditable="true"
-         style="top: 460px; left: 50%; transform: translateX(-50%);">
+      style="top: 60%; left: 50%; transform: translateX(-50%);">
       WITH PATIL FAMILY
     </div>
   </div>
@@ -132,6 +154,49 @@
       var rzp = new Razorpay(options);
       rzp.open();
     };
+
+    // --- Drag & Move Support (Mouse + Touch) ---
+    document.querySelectorAll(".editable").forEach(el => {
+      let offsetX, offsetY, isDragging = false;
+
+      const startDrag = (e) => {
+        e.preventDefault();
+        isDragging = true;
+        const rect = el.getBoundingClientRect();
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+        offsetX = clientX - rect.left;
+        offsetY = clientY - rect.top;
+      };
+
+      const moveDrag = (e) => {
+        if (!isDragging) return;
+        const cardRect = document.getElementById("card-area").getBoundingClientRect();
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+        let left = clientX - cardRect.left - offsetX;
+        let top = clientY - cardRect.top - offsetY;
+
+        // Prevent text going outside card
+        left = Math.max(0, Math.min(left, cardRect.width - el.offsetWidth));
+        top = Math.max(0, Math.min(top, cardRect.height - el.offsetHeight));
+
+        el.style.left = `${left}px`;
+        el.style.top = `${top}px`;
+        el.style.transform = "none";
+      };
+
+      const stopDrag = () => { isDragging = false; };
+
+      el.addEventListener("mousedown", startDrag);
+      el.addEventListener("mousemove", moveDrag);
+      el.addEventListener("mouseup", stopDrag);
+      el.addEventListener("mouseleave", stopDrag);
+
+      el.addEventListener("touchstart", startDrag, { passive: false });
+      el.addEventListener("touchmove", moveDrag, { passive: false });
+      el.addEventListener("touchend", stopDrag);
+    });
 
     // --- Download as PDF ---
     downloadBtn.onclick = async function() {
