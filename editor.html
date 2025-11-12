@@ -20,7 +20,6 @@
       padding: 20px;
     }
 
-    /* ✅ Responsive Card */
     .card-container {
       position: relative;
       width: 100%;
@@ -111,7 +110,7 @@
       <option value="https://i.postimg.cc/FHwCv1sd/BIRTHDAY-PARTY-1.jpg">Template 2</option>
     </select>
 
-    <button id="payButton" onclick="payNow()">Pay ₹1 to Unlock Download</button>
+    <button id="payButton" onclick="payNow()">Pay ₹1 to Unlock & Download</button>
     <button id="jpegButton" onclick="downloadCardAsJPEG()" disabled>Save as JPEG</button>
     <button id="pdfButton" onclick="downloadCardAsPDF()" disabled>Save as PDF</button>
   </div>
@@ -121,25 +120,27 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
 
   <script>
-    // ✅ Background Change
     function updateBackground() {
       const card = document.getElementById("card-container");
       card.style.backgroundImage = `url('${document.getElementById("template-selector").value}')`;
     }
 
-    // ✅ Payment Logic
-    function payNow() {
+    async function payNow() {
       const options = {
-        key: "rzp_live_RcZiOkCgOaOkaW", // Replace with your real key
+        key: "rzp_live_RcZiOkCgOaOkaW", // your Razorpay key
         amount: 100,
         currency: "INR",
         name: "Invitation Card Payment",
-        description: "Pay ₹1 to unlock downloads",
-        handler: function (response) {
-          // No page reload
-          alert("✅ Payment Successful!\nPayment ID: " + response.razorpay_payment_id);
+        description: "Pay ₹1 to unlock and auto-download",
+        handler: async function (response) {
           localStorage.setItem("downloadUnlocked", "true");
           enableDownloads();
+          alert("✅ Payment Successful! Downloads will start automatically.");
+
+          // Give browser time to finish Razorpay process
+          setTimeout(async () => {
+            await autoDownload();
+          }, 800);
         },
         prefill: { name: "Guest User", email: "guest@example.com", contact: "9999999999" },
         theme: { color: "#F37254" }
@@ -148,7 +149,6 @@
       rzp.open();
     }
 
-    // ✅ Unlock Downloads if previously paid (no refresh loss)
     function enableDownloads() {
       document.getElementById("jpegButton").disabled = false;
       document.getElementById("pdfButton").disabled = false;
@@ -158,63 +158,65 @@
       enableDownloads();
     }
 
-    // ✅ Drag + Boundary Lock
+    async function autoDownload() {
+      await downloadCardAsJPEG();
+      setTimeout(downloadCardAsPDF, 1500); // Small delay for stability
+    }
+
+    // ✅ Drag with touch support
     document.querySelectorAll('.editable').forEach(el => {
       let isDragging = false, shiftX, shiftY;
 
-      el.addEventListener('mousedown', e => {
+      function startDrag(e) {
         if (document.activeElement === el) return;
         isDragging = true;
-        shiftX = e.clientX - el.getBoundingClientRect().left;
-        shiftY = e.clientY - el.getBoundingClientRect().top;
 
+        const touch = e.touches ? e.touches[0] : e;
+        shiftX = touch.clientX - el.getBoundingClientRect().left;
+        shiftY = touch.clientY - el.getBoundingClientRect().top;
+      }
+
+      function moveDrag(e) {
+        if (!isDragging) return;
+        const touch = e.touches ? e.touches[0] : e;
         const container = document.getElementById("card-container");
-        const containerRect = container.getBoundingClientRect();
+        const rect = container.getBoundingClientRect();
+        const elRect = el.getBoundingClientRect();
+        const left = Math.max(0, Math.min(touch.clientX - shiftX - rect.left, rect.width - elRect.width));
+        const top = Math.max(0, Math.min(touch.clientY - shiftY - rect.top, rect.height - elRect.height));
+        el.style.left = left + "px";
+        el.style.top = top + "px";
+      }
 
-        function moveAt(pageX, pageY) {
-          const elRect = el.getBoundingClientRect();
-          const newLeft = pageX - shiftX - containerRect.left;
-          const newTop = pageY - shiftY - containerRect.top;
-          const maxLeft = containerRect.width - elRect.width;
-          const maxTop = containerRect.height - elRect.height;
-          el.style.left = Math.max(0, Math.min(newLeft, maxLeft)) + 'px';
-          el.style.top = Math.max(0, Math.min(newTop, maxTop)) + 'px';
-        }
+      function endDrag() {
+        isDragging = false;
+      }
 
-        function onMouseMove(e) {
-          if (isDragging) moveAt(e.pageX, e.pageY);
-        }
+      el.addEventListener("mousedown", startDrag);
+      el.addEventListener("mousemove", moveDrag);
+      el.addEventListener("mouseup", endDrag);
 
-        document.addEventListener('mousemove', onMouseMove);
-        el.addEventListener('mouseup', () => {
-          isDragging = false;
-          document.removeEventListener('mousemove', onMouseMove);
-        }, { once: true });
-      });
-
-      el.ondragstart = () => false;
+      el.addEventListener("touchstart", startDrag);
+      el.addEventListener("touchmove", moveDrag);
+      el.addEventListener("touchend", endDrag);
     });
 
     // ✅ JPEG Download
-    function downloadCardAsJPEG() {
-      html2canvas(document.getElementById("card-container"), { scale: 3, useCORS: true })
-        .then(canvas => {
-          const link = document.createElement("a");
-          link.download = "invitation-card.jpg";
-          link.href = canvas.toDataURL("image/jpeg", 1.0);
-          link.click();
-        });
+    async function downloadCardAsJPEG() {
+      const canvas = await html2canvas(document.getElementById("card-container"), { scale: 3, useCORS: true });
+      const link = document.createElement("a");
+      link.download = "invitation-card.jpg";
+      link.href = canvas.toDataURL("image/jpeg", 1.0);
+      link.click();
     }
 
     // ✅ PDF Download
-    function downloadCardAsPDF() {
-      html2canvas(document.getElementById("card-container"), { scale: 3, useCORS: true })
-        .then(canvas => {
-          const pdf = new jspdf.jsPDF({ orientation: "portrait", unit: "mm", format: [210, 297] });
-          const imgData = canvas.toDataURL("image/jpeg", 1.0);
-          pdf.addImage(imgData, "JPEG", 0, 0, 210, 297);
-          pdf.save("invitation-card.pdf");
-        });
+    async function downloadCardAsPDF() {
+      const canvas = await html2canvas(document.getElementById("card-container"), { scale: 3, useCORS: true });
+      const pdf = new jspdf.jsPDF({ orientation: "portrait", unit: "mm", format: [210, 297] });
+      const imgData = canvas.toDataURL("image/jpeg", 1.0);
+      pdf.addImage(imgData, "JPEG", 0, 0, 210, 297);
+      pdf.save("invitation-card.pdf");
     }
   </script>
 </body>
