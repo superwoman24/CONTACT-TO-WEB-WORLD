@@ -35,7 +35,6 @@
       overflow: hidden;
       background: white;
       box-shadow: 0 0 12px rgba(0, 0, 0, 0.2);
-      touch-action: none;
     }
 
     .card {
@@ -54,7 +53,6 @@
       outline: none;
       padding: 2px 6px;
       user-select: text;
-      cursor: move;
       word-break: break-word;
       max-width: 90%;
       left: 50%;
@@ -113,19 +111,19 @@
   <div class="card-container" id="card-area">
     <img src="https://i.postimg.cc/jjwV6GCk/BIRTHDAY-PARTY.jpg" alt="Invitation Template" class="card">
 
-    <div id="text1" class="editable" contenteditable="true" style="top: 22%;">
+    <div id="text1" class="editable" contenteditable="true" style="top: 30%; font-size: 48px;">
       SNEHA'S
     </div>
 
-    <div id="text2" class="editable" contenteditable="true" style="top: 42%;">
+    <div id="text2" class="editable" contenteditable="true" style="top: 60%;">
       DATE : 11 NOV. 2025<br>TIME : 8PM
     </div>
 
-    <div id="text3" class="editable" contenteditable="true" style="top: 54%;">
+    <div id="text3" class="editable" contenteditable="true" style="top: 70%;">
       VENUE : SUKANYA HALL MUMBAI
     </div>
 
-    <div id="text4" class="editable" contenteditable="true" style="top: 65%;">
+    <div id="text4" class="editable" contenteditable="true" style="top: 80%;">
       WITH PATIL FAMILY
     </div>
   </div>
@@ -157,50 +155,6 @@
       rzp.open();
     };
 
-    // --- Make Editable Elements Moveable (Mouse + Touch) ---
-    document.querySelectorAll(".editable").forEach(el => {
-      let offsetX = 0, offsetY = 0, isDragging = false;
-
-      const start = e => {
-        if (document.activeElement === el) return; // if typing, no drag
-        e.preventDefault();
-        isDragging = true;
-        const rect = el.getBoundingClientRect();
-        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-        offsetX = clientX - rect.left;
-        offsetY = clientY - rect.top;
-      };
-
-      const move = e => {
-        if (!isDragging) return;
-        const cardRect = document.getElementById("card-area").getBoundingClientRect();
-        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-
-        let left = clientX - cardRect.left - offsetX;
-        let top = clientY - cardRect.top - offsetY;
-
-        left = Math.max(0, Math.min(left, cardRect.width - el.offsetWidth));
-        top = Math.max(0, Math.min(top, cardRect.height - el.offsetHeight));
-
-        el.style.left = `${left}px`;
-        el.style.top = `${top}px`;
-        el.style.transform = "none";
-      };
-
-      const stop = () => (isDragging = false);
-
-      el.addEventListener("mousedown", start);
-      el.addEventListener("mousemove", move);
-      el.addEventListener("mouseup", stop);
-      el.addEventListener("mouseleave", stop);
-
-      el.addEventListener("touchstart", start, { passive: false });
-      el.addEventListener("touchmove", move, { passive: false });
-      el.addEventListener("touchend", stop);
-    });
-
     // --- Download as PDF ---
     downloadBtn.onclick = async function() {
       const cardArea = document.getElementById("card-area");
@@ -215,4 +169,3 @@
   </script>
 </body>
 </html>
-
