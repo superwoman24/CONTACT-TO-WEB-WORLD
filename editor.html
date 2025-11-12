@@ -31,6 +31,7 @@
       background-image: url("https://i.postimg.cc/hGkM2K8x/BIRTHDAY-PARTY.jpg");
       background-size: cover;
       background-position: center;
+      background-repeat: no-repeat;
       margin-bottom: 20px;
     }
 
@@ -45,6 +46,7 @@
       font-weight: bold;
       font-family: 'Poppins', cursive;
       outline: none;
+      padding: 2px 6px;
       transition: background-color 0.2s;
       word-wrap: break-word;
     }
@@ -70,7 +72,6 @@
       font-family: "Montserrat", sans-serif;
       width: 100%;
       box-sizing: border-box;
-      transition: 0.3s;
     }
 
     button {
@@ -79,18 +80,11 @@
       font-weight: 600;
       border: none;
       cursor: pointer;
+      transition: 0.3s;
     }
 
-    button:hover:enabled {
+    button:hover {
       background-color: #e55d4c;
-    }
-
-    /* Grey disabled look */
-    button:disabled {
-      background-color: #bfbfbf !important;
-      color: #666 !important;
-      cursor: not-allowed !important;
-      box-shadow: none !important;
     }
 
     @media (max-width: 500px) {
@@ -103,7 +97,7 @@
 <body>
 
   <div class="card-container" id="card-container">
-    <div id="text1" class="editable" contenteditable="true" style="top: 30%; font-size: 40px;">SNEHA'S</div>
+    <div id="text1" class="editable" contenteditable="true" style="top: 30%; color: #E75480; font-size: 40px;">SNEHA'S</div>
     <div id="text3" class="editable" contenteditable="true" style="top: 65%;">Date: 14th November 2025</div>
     <div id="text4" class="editable" contenteditable="true" style="top: 72%;">Venue:<br>Akshay Lawns, Shirwal</div>
     <div id="text5" class="editable" contenteditable="true" style="top: 83%;">With Patil Family</div>
@@ -117,8 +111,8 @@
     </select>
 
     <button id="payButton" onclick="payNow()">Pay ₹1 to Unlock & Download</button>
-    <button id="jpegButton" disabled onclick="downloadCardAsJPEG()">Save as JPEG</button>
-    <button id="pdfButton" disabled onclick="downloadCardAsPDF()">Save as PDF</button>
+    <button id="jpegButton" onclick="downloadCardAsJPEG()" disabled>Save as JPEG</button>
+    <button id="pdfButton" onclick="downloadCardAsPDF()" disabled>Save as PDF</button>
   </div>
 
   <!-- Libraries -->
@@ -126,19 +120,6 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
 
   <script>
-    const jpegBtn = document.getElementById("jpegButton");
-    const pdfBtn = document.getElementById("pdfButton");
-
-    function disableDownloads() {
-      jpegBtn.disabled = true;
-      pdfBtn.disabled = true;
-    }
-
-    function enableDownloads() {
-      jpegBtn.disabled = false;
-      pdfBtn.disabled = false;
-    }
-
     function updateBackground() {
       const card = document.getElementById("card-container");
       card.style.backgroundImage = `url('${document.getElementById("template-selector").value}')`;
@@ -146,16 +127,20 @@
 
     async function payNow() {
       const options = {
-        key: "rzp_live_RcZiOkCgOaOkaW",
+        key: "rzp_live_RcZiOkCgOaOkaW", // your Razorpay key
         amount: 100,
         currency: "INR",
         name: "Invitation Card Payment",
         description: "Pay ₹1 to unlock and auto-download",
-        handler: async function () {
+        handler: async function (response) {
           localStorage.setItem("downloadUnlocked", "true");
           enableDownloads();
-          alert("✅ Payment Successful! Downloads unlocked.");
-          setTimeout(autoDownload, 1000);
+          alert("✅ Payment Successful! Downloads will start automatically.");
+
+          // Give browser time to finish Razorpay process
+          setTimeout(async () => {
+            await autoDownload();
+          }, 800);
         },
         prefill: { name: "Guest User", email: "guest@example.com", contact: "9999999999" },
         theme: { color: "#F37254" }
@@ -164,33 +149,34 @@
       rzp.open();
     }
 
-    async function autoDownload() {
-      await downloadCardAsJPEG();
-      setTimeout(downloadCardAsPDF, 1500);
+    function enableDownloads() {
+      document.getElementById("jpegButton").disabled = false;
+      document.getElementById("pdfButton").disabled = false;
     }
 
-    // check previous unlock
-    window.addEventListener("load", () => {
-      if (localStorage.getItem("downloadUnlocked") === "true") {
-        enableDownloads();
-      } else {
-        disableDownloads();
-      }
-    });
+    if (localStorage.getItem("downloadUnlocked") === "true") {
+      enableDownloads();
+    }
 
-    // drag support
+    async function autoDownload() {
+      await downloadCardAsJPEG();
+      setTimeout(downloadCardAsPDF, 1500); // Small delay for stability
+    }
+
+    // ✅ Drag with touch support
     document.querySelectorAll('.editable').forEach(el => {
       let isDragging = false, shiftX, shiftY;
 
-      const startDrag = (e) => {
+      function startDrag(e) {
         if (document.activeElement === el) return;
         isDragging = true;
+
         const touch = e.touches ? e.touches[0] : e;
         shiftX = touch.clientX - el.getBoundingClientRect().left;
         shiftY = touch.clientY - el.getBoundingClientRect().top;
-      };
+      }
 
-      const moveDrag = (e) => {
+      function moveDrag(e) {
         if (!isDragging) return;
         const touch = e.touches ? e.touches[0] : e;
         const container = document.getElementById("card-container");
@@ -200,18 +186,22 @@
         const top = Math.max(0, Math.min(touch.clientY - shiftY - rect.top, rect.height - elRect.height));
         el.style.left = left + "px";
         el.style.top = top + "px";
-      };
+      }
 
-      const endDrag = () => isDragging = false;
+      function endDrag() {
+        isDragging = false;
+      }
 
       el.addEventListener("mousedown", startDrag);
       el.addEventListener("mousemove", moveDrag);
       el.addEventListener("mouseup", endDrag);
+
       el.addEventListener("touchstart", startDrag);
       el.addEventListener("touchmove", moveDrag);
       el.addEventListener("touchend", endDrag);
     });
 
+    // ✅ JPEG Download
     async function downloadCardAsJPEG() {
       const canvas = await html2canvas(document.getElementById("card-container"), { scale: 3, useCORS: true });
       const link = document.createElement("a");
@@ -220,6 +210,7 @@
       link.click();
     }
 
+    // ✅ PDF Download
     async function downloadCardAsPDF() {
       const canvas = await html2canvas(document.getElementById("card-container"), { scale: 3, useCORS: true });
       const pdf = new jspdf.jsPDF({ orientation: "portrait", unit: "mm", format: [210, 297] });
