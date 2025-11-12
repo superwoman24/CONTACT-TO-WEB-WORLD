@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>A4 Ratio Editable Invitation Card</title>
+  <title>Editable A4 Invitation Card</title>
   <link href="https://fonts.googleapis.com/css2?family=Baloo+Bhai+2:wght@700&display=swap" rel="stylesheet">
   <link rel="icon" href="https://i.postimg.cc/DZRP5pxv/logo.png" type="image/png">
   <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
@@ -14,11 +14,10 @@
     * {
       box-sizing: border-box;
       -webkit-tap-highlight-color: transparent;
-      margin: 0;
-      padding: 0;
     }
 
     body {
+      margin: 0;
       background: #f5f5f5;
       font-family: 'Baloo Bhai 2', cursive;
       display: flex;
@@ -26,17 +25,16 @@
       align-items: center;
       justify-content: center;
       min-height: 100vh;
-      overflow-x: hidden;
     }
 
     .card-container {
       position: relative;
-      width: min(90vw, 420px); /* locks consistent size across devices */
-      aspect-ratio: 1 / 1.414; /* A4 ratio */
-      background: #fff;
+      width: min(90vw, 420px);
+      aspect-ratio: 1 / 1.414;
       border-radius: 12px;
       overflow: hidden;
-      box-shadow: 0 0 12px rgba(0,0,0,0.25);
+      background: white;
+      box-shadow: 0 0 12px rgba(0, 0, 0, 0.2);
       touch-action: none;
     }
 
@@ -44,56 +42,48 @@
       width: 100%;
       height: 100%;
       object-fit: cover;
-      pointer-events: none;
       user-select: none;
-      display: block;
+      pointer-events: none;
     }
 
     .editable {
       position: absolute;
       color: #E75480;
+      font-size: clamp(14px, 3.5vw, 26px);
       text-align: center;
-      cursor: text;
-      user-select: text;
       outline: none;
-      padding: 3px 6px;
-      font-size: 1.6vw;
-      line-height: 1.2em;
+      padding: 2px 6px;
+      user-select: text;
+      cursor: move;
       word-break: break-word;
       max-width: 90%;
       left: 50%;
       transform: translateX(-50%);
-      touch-action: none;
     }
 
-    @media (max-width: 480px) {
-      .editable {
-        font-size: 3.8vw; /* font auto scales */
-      }
+    .editable:focus {
+      border: 2px dashed #ff4da6;
+      background: rgba(255, 255, 255, 0.8);
     }
 
     .controls {
-      margin-top: 18px;
+      margin-top: 15px;
       display: flex;
       flex-wrap: wrap;
-      gap: 12px;
+      gap: 10px;
       justify-content: center;
-      width: 100%;
-      max-width: 400px;
     }
 
     button {
-      flex: 1;
-      min-width: 140px;
       padding: 10px 16px;
       border: none;
       border-radius: 8px;
       background: #ff4da6;
-      color: white;
+      color: #fff;
       font-weight: bold;
-      font-size: 1rem;
       cursor: pointer;
       transition: 0.3s;
+      font-size: 1rem;
     }
 
     button:hover {
@@ -103,6 +93,17 @@
     button:disabled {
       background: gray;
       cursor: not-allowed;
+    }
+
+    @media (max-width: 480px) {
+      .controls {
+        flex-direction: column;
+        width: 90%;
+      }
+
+      button {
+        width: 100%;
+      }
     }
   </style>
 </head>
@@ -155,11 +156,12 @@
       rzp.open();
     };
 
-    // --- Drag & Move Support (Mouse + Touch) ---
+    // --- Make Editable Elements Moveable (Mouse + Touch) ---
     document.querySelectorAll(".editable").forEach(el => {
-      let offsetX, offsetY, isDragging = false;
+      let offsetX = 0, offsetY = 0, isDragging = false;
 
-      const startDrag = (e) => {
+      const start = e => {
+        if (document.activeElement === el) return; // if typing, no drag
         e.preventDefault();
         isDragging = true;
         const rect = el.getBoundingClientRect();
@@ -169,15 +171,15 @@
         offsetY = clientY - rect.top;
       };
 
-      const moveDrag = (e) => {
+      const move = e => {
         if (!isDragging) return;
         const cardRect = document.getElementById("card-area").getBoundingClientRect();
         const clientX = e.touches ? e.touches[0].clientX : e.clientX;
         const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
         let left = clientX - cardRect.left - offsetX;
         let top = clientY - cardRect.top - offsetY;
 
-        // Prevent text from going outside card
         left = Math.max(0, Math.min(left, cardRect.width - el.offsetWidth));
         top = Math.max(0, Math.min(top, cardRect.height - el.offsetHeight));
 
@@ -186,16 +188,16 @@
         el.style.transform = "none";
       };
 
-      const stopDrag = () => { isDragging = false; };
+      const stop = () => (isDragging = false);
 
-      el.addEventListener("mousedown", startDrag);
-      el.addEventListener("mousemove", moveDrag);
-      el.addEventListener("mouseup", stopDrag);
-      el.addEventListener("mouseleave", stopDrag);
+      el.addEventListener("mousedown", start);
+      el.addEventListener("mousemove", move);
+      el.addEventListener("mouseup", stop);
+      el.addEventListener("mouseleave", stop);
 
-      el.addEventListener("touchstart", startDrag, { passive: false });
-      el.addEventListener("touchmove", moveDrag, { passive: false });
-      el.addEventListener("touchend", stopDrag);
+      el.addEventListener("touchstart", start, { passive: false });
+      el.addEventListener("touchmove", move, { passive: false });
+      el.addEventListener("touchend", stop);
     });
 
     // --- Download as PDF ---
