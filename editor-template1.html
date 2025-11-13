@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Editable A4 Invitation Card</title>
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+Bhai+2:wght@700&display=swap" rel="stylesheet">
+  <link rel="icon" href="https://i.postimg.cc/DZRP5pxv/logo.png" type="image/png">
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      margin: 0;
+      background: #f5f5f5;
+      font-family: 'Baloo Bhai 2', cursive;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+    }
+
+    .card-container {
+      position: relative;
+      width: min(90vw, 420px);
+      aspect-ratio: 1 / 1.414;
+      border-radius: 12px;
+      overflow: hidden;
+      background: white;
+      box-shadow: 0 0 12px rgba(0, 0, 0, 0.2);
+    }
+
+    .card {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      user-select: none;
+      pointer-events: none;
+    }
+
+    .editable {
+      position: absolute;
+      color: #E75480;
+      font-size: clamp(14px, 3.5vw, 18px);
+      text-align: center;
+      outline: none;
+      padding: 2px 6px;
+      user-select: text;
+      /* word-break: break-word; */
+      max-width: 90%;
+      left: 50%;
+      transform: translateX(-50%);
+      pointer-events: auto;
+    }
+
+    .editable:focus {
+      border: 2px dashed #ff4da6;
+      background: rgba(255, 255, 255, 0.8);
+    }
+
+    .controls {
+      margin-top: 15px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+    }
+
+    button {
+      padding: 10px 16px;
+      border: none;
+      border-radius: 8px;
+      background: #ff4da6;
+      color: #fff;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.3s;
+      font-size: 1rem;
+    }
+
+    button:hover {
+      background: #e60073;
+    }
+
+    button:disabled {
+      background: gray;
+      cursor: not-allowed;
+    }
+
+    @media (max-width: 480px) {
+      .controls {
+        flex-direction: column;
+        width: 90%;
+      }
+
+      button {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="card-container" id="card-area">
+    <img src="https://i.postimg.cc/jjwV6GCk/BIRTHDAY-PARTY.jpg" alt="Invitation Template" class="card">
+
+    <div id="text1" class="editable" contenteditable="true" style="top: 30%; font-size: 36px;">
+      SNEHA'S
+    </div>
+
+    <div id="text2" class="editable" contenteditable="true" style="top: 60%;">
+      DATE : 11 NOV. 2025<br>TIME : 8PM
+    </div>
+
+    <div id="text3" class="editable" contenteditable="true" style="top: 70%;">
+      VENUE : SUKANYA HALL MUMBAI
+    </div>
+
+    <div id="text4" class="editable" contenteditable="true" style="top: 80%;">
+      WITH PATIL FAMILY
+    </div>
+  </div>
+
+  <div class="controls">
+    <button id="payBtn">Pay ₹200</button>
+    <button id="downloadBtn" disabled>Download Card</button>
+  </div>
+
+  <script>
+    const payBtn = document.getElementById("payBtn");
+    const downloadBtn = document.getElementById("downloadBtn");
+
+    // --- Razorpay Payment ---
+    payBtn.onclick = function() {
+      var options = {
+        key: "rzp_live_RcZiOkCgOaOkaW",
+        amount: 20000,
+        currency: "INR",
+        name: "Web World",
+        description: "Card Download Unlock",
+        handler: function() {
+          alert("Payment successful! Download unlocked.");
+          downloadBtn.disabled = false;
+        },
+        theme: { color: "#ff4da6" }
+      };
+      var rzp = new Razorpay(options);
+      rzp.open();
+    };
+
+    // --- Download as PDF ---
+    downloadBtn.onclick = async function() {
+      const cardArea = document.getElementById("card-area");
+      const canvas = await html2canvas(cardArea, { useCORS: true, scale: 2 });
+      const imgData = canvas.toDataURL("image/png");
+      const pdf = new jspdf.jsPDF("p", "mm", "a4");
+      const width = pdf.internal.pageSize.getWidth();
+      const height = (canvas.height * width) / canvas.width;
+      pdf.addImage(imgData, "PNG", 0, 0, width, height);
+      pdf.save("InvitationCard.pdf");
+    };
+  </script>
+</body>
+</html>
+
+
+
