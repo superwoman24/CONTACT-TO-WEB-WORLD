@@ -22,16 +22,19 @@ body {
 .card-container {
   position: relative;
   width: 420px;       /* Fixed width for display */
-  height: 594px;      /* Fixed height for A4 ratio */
+  height: 594px;      /* Fixed height A4 ratio */
   border-radius: 12px;
   overflow: hidden;
   box-shadow: 0 0 12px rgba(0,0,0,0.2);
 }
 
 .card-container img {
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
   height: 100%;
-  object-fit: cover; /* Ensures mobile & laptop show correctly */
+  object-fit: cover;  /* Ensures image covers container without stretching */
   display: block;
   pointer-events: none;
 }
@@ -76,10 +79,13 @@ button:disabled {
   cursor: not-allowed;
 }
 
+/* Mobile scaling: card-container scales but keeps aspect ratio */
 @media (max-width: 480px) {
   .card-container {
-    width: 320px;
-    height: 454px; /* maintain aspect ratio */
+    transform: scale(0.76); /* 420/320 = 0.76, keeps text positions */
+    transform-origin: top left;
+    width: 420px;
+    height: 594px;
   }
 }
 </style>
