@@ -4,7 +4,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Editable A4 Invitation Card</title>
-
+  <link rel="icon" href="https://i.postimg.cc/DZRP5pxv/logo.png" type="image/png">
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <!-- Arial Bold CSS Fix -->
   <style>
     @font-face {
@@ -14,15 +17,11 @@
     }
   </style>
 
-  <link rel="icon" href="https://i.postimg.cc/DZRP5pxv/logo.png" type="image/png">
-  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
   <style>
     * {
       box-sizing: border-box;
-      font-family: Arial, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+      font-family: Arial, sans-serif; /* <<< FULL ARIAL BOLD */
       font-weight: bold;
     }
 
@@ -39,7 +38,7 @@
     .card-container {
       position: relative;
       width: min(90vw, 420px);
-      aspect-ratio: 1 / 1.414; /* A4 Ratio */
+      aspect-ratio: 1 / 1.414;
       border-radius: 12px;
       overflow: hidden;
       background: white;
@@ -50,22 +49,25 @@
       width: 100%;
       height: 100%;
       object-fit: cover;
+      user-select: none;
       pointer-events: none;
     }
 
-    /* ---- FIXED TEXT POSITION SYSTEM ---- */
     .editable {
       position: absolute;
-      transform: translate(-50%, -50%);
       color: #E75480;
+      font-size: clamp(14px, 3.5vw, 18px);
       text-align: center;
       outline: none;
       padding: 2px 6px;
+      user-select: text;
+      max-width: 90%;
+      left: 50%;
+      transform: translateX(-50%);
       pointer-events: auto;
-      width: auto;
-      max-width: 80%;
+
+      font-family: Arial, sans-serif !important; /* <<< FORCE ARIAL BOLD */
       font-weight: bold !important;
-      font-family: Arial, sans-serif !important;
     }
 
     .editable:focus {
@@ -91,6 +93,8 @@
       cursor: pointer;
       transition: 0.3s;
       font-size: 1rem;
+
+      font-family: Arial, sans-serif !important; /* ARIAL bold */
     }
 
     button:hover {
@@ -101,47 +105,69 @@
       background: gray;
       cursor: not-allowed;
     }
+
+    @media (max-width: 480px) {
+      .controls {
+        flex-direction: column;
+        width: 90%;
+      }
+
+      button {
+        width: 100%;
+      }
+    }
   </style>
 </head>
 <body>
 
   <div class="card-container" id="card-area">
-    <img src="https://i.postimg.cc/7YcT4qT8/wedding-card1.jpg" class="card">
+    <img src="https://i.postimg.cc/7YcT4qT8/wedding-card1.jpg" alt="Invitation Template" class="card">
 
-    <!-- Fixed Center-Based Positions -->
-    <div id="text1" class="editable" contenteditable="true" style="top: 19%; left: 30%; font-size: 24px; color:#493313;">चव्हाण</div>
+    <div id="text1" class="editable" contenteditable="true" style="top: 19%; left: 30%; font-size: 24px; color: #493313;">
+      चव्हाण
+    </div>
 
-    <div id="text2" class="editable" contenteditable="true" style="top: 19%; left: 70%; font-size: 24px; color:#493313;">अभ्यंकर</div>
+    <div id="text2" class="editable" contenteditable="true" style="top: 19%; left: 70%; font-size: 24px; color: #493313;">
+      अभ्यंकर
+    </div>
 
-    <div id="text3" class="editable" contenteditable="true" style="top: 25%; left: 30%; font-size: 14px; color:#800000;">चि.</div>
+    <div id="text3" class="editable" contenteditable="true" style="top: 25%; left: 30%; font-size: 14px; color: #800000;">
+      चि.
+    </div>
 
-    <div id="text4" class="editable" contenteditable="true" style="top: 25%; left: 70%; font-size: 14px; color:#800000;">चि. सौ. का</div>
+    <div id="text4" class="editable" contenteditable="true" style="top: 25%; left: 70%; font-size: 14px; color: #800000">
+      चि. सौ. का
+    </div>
 
-    <div id="text5" class="editable" contenteditable="true" style="top: 28%; left: 30%; font-size: 24px; color:#800000;">सुनिल</div>
+    <div id="text5" class="editable" contenteditable="true" style="top: 28%; left: 30%; font-size: 24px; color: #800000">
+      सुनिल
+    </div>
 
-    <div id="text6" class="editable" contenteditable="true" style="top: 28%; left: 70%; font-size: 24px; color:#800000;">संपदा</div>
+    <div id="text6" class="editable" contenteditable="true" style="top: 28%; left: 70%; font-size: 24px; color: #800000">
+      संपदा
+    </div>
 
-    <div id="text7" class="editable" contenteditable="true" style="top: 35%; left: 32%; font-size: 10px; color:#493313;">
+    <div id="text7" class="editable" contenteditable="true" style="top: 35%; left: 32%; font-size: 10px; color: #493313;">
       नरसिंग थावरु चव्हाण आणि <br>मणीबाई नरसिंग चव्हाण यांचे चिरंजीव.<br>रा. जय जवान नगर पुणे.
     </div>
 
-    <div id="text8" class="editable" contenteditable="true" style="top: 35%; left: 70%; font-size: 10px; color:#493313;">
+    <div id="text8" class="editable" contenteditable="true" style="top: 35%; left: 70%; font-size: 10px; color: #493313;">
       गणेश अभ्यंकर आणि <br>मंगल अभ्यंकर यांची कन्या. <br>रा. कडूस पुणे.
     </div>
 
-    <div id="text9" class="editable" contenteditable="true" style="top: 63%; left:50%; font-size: 12px; color:#493313;">
+    <div id="text9" class="editable" contenteditable="true" style="top: 63%; font-size: 12px; color: #493313;">
       दि. १५-०९-२०२५ रोजी दुपारी. ०१.५५ वा या शुभमुहुर्तावर करण्याचे योजिले आहे.
     </div>
 
-    <div id="text10" class="editable" contenteditable="true" style="top: 81%; left:50%; font-size: 16px; color:#800000;">
+    <div id="text10" class="editable" contenteditable="true" style="top: 81%; font-size: 16px; color: #800000">
       पोफळे मंगल कार्यालय
     </div>
 
-    <div id="text11" class="editable" contenteditable="true" style="top: 85%; left:50%; font-size: 14px; color:#493313;">
+    <div id="text11" class="editable" contenteditable="true" style="top: 85%; font-size: 14px; color: #493313;">
       आळंदी पुणे.
     </div>
 
-    <div id="text12" class="editable" contenteditable="true" style="top: 90%; left:50%; font-size: 16px; color:#800000;">
+    <div id="text12" class="editable" contenteditable="true" style="top: 90%; font-size: 16px; color: #800000">
       समस्त चव्हाण व अभ्यंकर परिवार
     </div>
   </div>
