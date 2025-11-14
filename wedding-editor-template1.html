@@ -1,195 +1,160 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Editable A4 Invitation Card</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Editable A4 Invitation Card</title>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
-  <style>
-    body {
-      margin: 0;
-      background: #f5f5f5;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 20px;
-      font-family: Arial, sans-serif;
-    }
+<style>
+body {
+  margin: 0;
+  background: #f5f5f5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  font-family: Arial, sans-serif;
+}
 
-    .card-container {
-      position: relative;
-      width: 420px;        /* FIXED WIDTH */
-      height: 594px;       /* FIXED HEIGHT — A4 ratio */
-      border-radius: 12px;
-      overflow: hidden;
-      background: white;
-      box-shadow: 0 0 12px rgba(0, 0, 0, 0.2);
-    }
+.card-container {
+  position: relative;
+  width: 420px;       /* Fixed width for display */
+  height: 594px;      /* Fixed height for A4 ratio */
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 0 12px rgba(0,0,0,0.2);
+}
 
-    .card {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      pointer-events: none;
-    }
+.card-container img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Ensures mobile & laptop show correctly */
+  display: block;
+  pointer-events: none;
+}
 
-    .editable {
-      position: absolute;
-      color: #E75480;
-      font-family: Arial, sans-serif;
-      font-weight: bold;
-      text-align: center;
-      cursor: text;
-      outline: none;
-    }
+.editable {
+  position: absolute;
+  font-family: Arial, sans-serif;
+  font-weight: bold;
+  text-align: center;
+  cursor: text;
+  outline: none;
+}
 
-    .editable:focus {
-      border: 2px dashed #ff4da6;
-      background: rgba(255, 255, 255, 0.8);
-    }
+.editable:focus {
+  border: 2px dashed #ff4da6;
+  background: rgba(255,255,255,0.8);
+}
 
-    .controls {
-      margin-top: 20px;
-      display: flex;
-      gap: 12px;
-    }
+.controls {
+  margin-top: 20px;
+  display: flex;
+  gap: 12px;
+}
 
-    button {
-      padding: 10px 20px;
-      border: none;
-      background: #ff4da6;
-      color: white;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 16px;
-      font-weight: bold;
-    }
+button {
+  padding: 10px 20px;
+  border: none;
+  background: #ff4da6;
+  color: white;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+}
 
-    button:hover {
-      background: #d6006b;
-    }
+button:hover {
+  background: #d6006b;
+}
 
-    button:disabled {
-      background: gray;
-      cursor: not-allowed;
-    }
-  </style>
+button:disabled {
+  background: gray;
+  cursor: not-allowed;
+}
+
+@media (max-width: 480px) {
+  .card-container {
+    width: 320px;
+    height: 454px; /* maintain aspect ratio */
+  }
+}
+</style>
 </head>
+
 <body>
 
-  <div class="card-container" id="card-area">
-    <img src="https://i.postimg.cc/7YcT4qT8/wedding-card1.jpg" class="card">
+<div class="card-container" id="card-area">
+  <img src="https://i.postimg.cc/7YcT4qT8/wedding-card1.jpg" alt="Invitation Template">
 
-    <!-- ALL TEXT IN PIXELS BELOW -->
-    <div id="text1" class="editable" contenteditable="true"
-         style="top: 110px; left: 100px; font-size: 24px; color:#493313;">
-      चव्हाण
-    </div>
-
-    <div id="text2" class="editable" contenteditable="true"
-         style="top: 110px; left: 270px; font-size: 24px; color:#493313;">
-      अभ्यंकर
-    </div>
-
-    <div id="text3" class="editable" contenteditable="true"
-         style="top: 150px; left: 95px; font-size: 14px; color:#800000;">
-      चि.
-    </div>
-
-    <div id="text4" class="editable" contenteditable="true"
-         style="top: 150px; left: 270px; font-size: 14px; color:#800000;">
-      चि. सौ. का
-    </div>
-
-    <div id="text5" class="editable" contenteditable="true"
-         style="top: 180px; left: 90px; font-size: 24px; color:#800000;">
-      सुनिल
-    </div>
-
-    <div id="text6" class="editable" contenteditable="true"
-         style="top: 180px; left: 270px; font-size: 24px; color:#800000;">
-      संपदा
-    </div>
-
-    <div id="text7" class="editable" contenteditable="true"
-         style="top: 225px; left: 90px; font-size: 11px; width:130px; color:#493313;">
-      नरसिंग थावरु चव्हाण आणि <br>मणीबाई नरसिंग चव्हाण यांचे चिरंजीव.<br>रा. जय जवान नगर पुणे.
-    </div>
-
-    <div id="text8" class="editable" contenteditable="true"
-         style="top: 225px; left: 260px; font-size: 11px; width:130px; color:#493313;">
-      गणेश अभ्यंकर आणि <br>मंगल अभ्यंकर यांची कन्या. <br>रा. कडूस पुणे.
-    </div>
-
-    <div id="text9" class="editable" contenteditable="true"
-         style="top: 360px; left: 40px; font-size: 12px; width:340px; color:#493313; text-align:center;">
-      दि. १५-०९-२०२५ रोजी दुपारी. ०१.५५ वा या शुभमुहुर्तावर करण्याचे योजिले आहे.
-    </div>
-
-    <div id="text10" class="editable" contenteditable="true"
-         style="top: 480px; left: 130px; font-size: 18px; color:#800000;">
-      पोफळे मंगल कार्यालय
-    </div>
-
-    <div id="text11" class="editable" contenteditable="true"
-         style="top: 510px; left: 170px; font-size: 14px; color:#493313;">
-      आळंदी पुणे.
-    </div>
-
-    <div id="text12" class="editable" contenteditable="true"
-         style="top: 545px; left: 110px; font-size: 16px; color:#800000;">
-      समस्त चव्हाण व अभ्यंकर परिवार
-    </div>
-
+  <!-- Fixed position text in px -->
+  <div id="text1" class="editable" contenteditable="true" style="top:110px; left:100px; font-size:24px; color:#493313;">चव्हाण</div>
+  <div id="text2" class="editable" contenteditable="true" style="top:110px; left:270px; font-size:24px; color:#493313;">अभ्यंकर</div>
+  <div id="text3" class="editable" contenteditable="true" style="top:150px; left:95px; font-size:14px; color:#800000;">चि.</div>
+  <div id="text4" class="editable" contenteditable="true" style="top:150px; left:270px; font-size:14px; color:#800000;">चि. सौ. का</div>
+  <div id="text5" class="editable" contenteditable="true" style="top:180px; left:90px; font-size:24px; color:#800000;">सुनिल</div>
+  <div id="text6" class="editable" contenteditable="true" style="top:180px; left:270px; font-size:24px; color:#800000;">संपदा</div>
+  <div id="text7" class="editable" contenteditable="true" style="top:225px; left:90px; width:130px; font-size:11px; color:#493313;">
+    नरसिंग थावरु चव्हाण आणि <br>मणीबाई नरसिंग चव्हाण यांचे चिरंजीव.<br>रा. जय जवान नगर पुणे.
   </div>
-
-  <div class="controls">
-    <button id="payBtn">Pay ₹350</button>
-    <button id="downloadBtn" disabled>Download Card</button>
+  <div id="text8" class="editable" contenteditable="true" style="top:225px; left:260px; width:130px; font-size:11px; color:#493313;">
+    गणेश अभ्यंकर आणि <br>मंगल अभ्यंकर यांची कन्या. <br>रा. कडूस पुणे.
   </div>
+  <div id="text9" class="editable" contenteditable="true" style="top:360px; left:40px; width:340px; font-size:12px; color:#493313;">दि. १५-०९-२०२५ रोजी दुपारी. ०१.५५ वा या शुभमुहुर्तावर करण्याचे योजिले आहे.</div>
+  <div id="text10" class="editable" contenteditable="true" style="top:480px; left:130px; font-size:18px; color:#800000;">पोफळे मंगल कार्यालय</div>
+  <div id="text11" class="editable" contenteditable="true" style="top:510px; left:170px; font-size:14px; color:#493313;">आळंदी पुणे.</div>
+  <div id="text12" class="editable" contenteditable="true" style="top:545px; left:110px; font-size:16px; color:#800000;">समस्त चव्हाण व अभ्यंकर परिवार</div>
+</div>
 
-  <script>
-    const payBtn = document.getElementById("payBtn");
-    const downloadBtn = document.getElementById("downloadBtn");
+<div class="controls">
+  <button id="payBtn">Pay ₹350</button>
+  <button id="downloadBtn" disabled>Download Card</button>
+</div>
 
-    payBtn.onclick = function() {
-      alert("Payment Successful! Download Unlocked.");
-      downloadBtn.disabled = false;
-    };
+<script>
+const payBtn = document.getElementById("payBtn");
+const downloadBtn = document.getElementById("downloadBtn");
 
-    downloadBtn.onclick = async function () {
-        const card = document.getElementById("card-area");
+payBtn.onclick = function() {
+  alert("Payment Successful! Download Unlocked.");
+  downloadBtn.disabled = false;
+}
 
-        // Target 300 DPI resolution for A4
-        const TARGET_WIDTH = 2480;
-        const TARGET_HEIGHT = 3508;
+downloadBtn.onclick = async function() {
+  const card = document.getElementById("card-area");
 
-        // Scale factor = required pixels / actual pixels
-        const scaleX = TARGET_WIDTH / card.offsetWidth;
-        const scaleY = TARGET_HEIGHT / card.offsetHeight;
-        const scale = Math.min(scaleX, scaleY);
+  // 300 DPI A4 resolution
+  const TARGET_WIDTH = 2480;
+  const TARGET_HEIGHT = 3508;
 
-        const canvas = await html2canvas(card, {
-            scale: scale,
-            useCORS: true,
-            allowTaint: true
-        });
+  const scaleX = TARGET_WIDTH / card.offsetWidth;
+  const scaleY = TARGET_HEIGHT / card.offsetHeight;
+  const scale = Math.min(scaleX, scaleY);
 
-        const imgData = canvas.toDataURL("image/png");
-        const pdf = new jspdf.jsPDF("p", "mm", "a4");
+  const canvas = await html2canvas(card, {
+    scale: scale,
+    useCORS: true,
+    allowTaint: true
+  });
 
-        pdf.addImage(
-            imgData,
-            "PNG",
-            0,
-            0,
-            pdf.internal.pageSize.getWidth(),
-            pdf.internal.pageSize.getHeight()
-        );
+  const imgData = canvas.toDataURL("image/png");
+  const pdf = new jspdf.jsPDF("p", "mm", "a4");
 
-        pdf.save("InvitationCard_300DPI.pdf");
-    };
-  </script>
+  pdf.addImage(
+    imgData,
+    "PNG",
+    0,
+    0,
+    pdf.internal.pageSize.getWidth(),
+    pdf.internal.pageSize.getHeight()
+  );
+
+  pdf.save("InvitationCard_300DPI.pdf");
+}
+</script>
 
 </body>
 </html>
