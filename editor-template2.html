@@ -3,7 +3,6 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="google-site-verification" content="cIP87lHay_vUDn9wvgFq-8A9bh6IQjMTXu4Eaod7ejI" />
   <title>Editable A4 Invitation Card</title>
   <link href="https://fonts.googleapis.com/css2?family=Baloo+Bhai+2:wght@700&display=swap" rel="stylesheet">
   <link rel="icon" href="https://i.postimg.cc/DZRP5pxv/logo.png" type="image/png">
@@ -46,6 +45,27 @@
       pointer-events: none;
     }
 
+    /* ---------------- WATERMARK STYLE ---------------- */
+    .watermark {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) rotate(-30deg);
+      font-size: 48px;
+      color: rgba(0, 0, 0, 0.12);
+      font-weight: 900;
+      letter-spacing: 4px;
+      user-select: none;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* PDF banate time hide */
+    .hide-watermark {
+      display: none !important;
+    }
+    /* -------------------------------------------------- */
+
     .editable {
       position: absolute;
       color: #E75480;
@@ -53,12 +73,11 @@
       text-align: center;
       outline: none;
       padding: 2px 6px;
-      user-select: text;
-      /* word-break: break-word; */
       max-width: 90%;
       left: 50%;
       transform: translateX(-50%);
       pointer-events: auto;
+      z-index: 2;
     }
 
     .editable:focus {
@@ -110,7 +129,11 @@
 <body>
 
   <div class="card-container" id="card-area">
-    <img src="https://i.postimg.cc/qvF0K54w/BIRTHDAY-PARTY-1.jpg" alt="Invitation Template" class="card">
+
+    <!-- 🔥 WATERMARK ADDED HERE -->
+    <div class="watermark" id="wm">CONTACT TO WEB WORLD</div>
+
+    <img src="https://i.postimg.cc/jjwV6GCk/BIRTHDAY-PARTY.jpg" alt="Invitation Template" class="card">
 
     <div id="text1" class="editable" contenteditable="true" style="top: 30%; font-size: 36px;">
       SNEHA'S
@@ -137,12 +160,13 @@
   <script>
     const payBtn = document.getElementById("payBtn");
     const downloadBtn = document.getElementById("downloadBtn");
+    const watermark = document.getElementById("wm");
 
-    // --- Razorpay Payment ---
+    // ---------------- PAYMENT ----------------
     payBtn.onclick = function() {
       var options = {
         key: "rzp_live_RcZiOkCgOaOkaW",
-        amount: 20000,
+        amount: 100,
         currency: "INR",
         name: "Web World",
         description: "Card Download Unlock",
@@ -156,22 +180,25 @@
       rzp.open();
     };
 
-    // --- Download as PDF ---
+    // ---------------- PDF DOWNLOAD ----------------
     downloadBtn.onclick = async function() {
+
+      // 1️⃣ PDF se pehle watermark hide
+      watermark.classList.add("hide-watermark");
+
       const cardArea = document.getElementById("card-area");
-      const canvas = await html2canvas(cardArea, { useCORS: true, scale: 4 });
+      const canvas = await html2canvas(cardArea, { useCORS: true, scale: 2 });
       const imgData = canvas.toDataURL("image/png");
       const pdf = new jspdf.jsPDF("p", "mm", "a4");
       const width = pdf.internal.pageSize.getWidth();
       const height = (canvas.height * width) / canvas.width;
+
       pdf.addImage(imgData, "PNG", 0, 0, width, height);
       pdf.save("InvitationCard.pdf");
+
+      // 2️⃣ PDF ke baad watermark wapas show
+      watermark.classList.remove("hide-watermark");
     };
   </script>
 </body>
 </html>
-
-
-
-
-
