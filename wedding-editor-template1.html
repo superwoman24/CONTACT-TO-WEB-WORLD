@@ -39,7 +39,26 @@ body {
   display: block;
   pointer-events: none;
 }
+/* ---------------- WATERMARK STYLE ---------------- */
+.watermark {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(-30deg);
+  font-size: 48px;
+  color: rgba(0, 0, 0, 0.12);
+  font-weight: 900;
+  letter-spacing: 4px;
+  user-select: none;
+  pointer-events: none;
+  z-index: 1;
+}
 
+/* PDF banate time hide */
+.hide-watermark {
+  display: none !important;
+}
+/* -------------------------------------------------- */
 .editable {
   position: absolute;
   font-family: Arial, sans-serif;
@@ -96,6 +115,8 @@ button:disabled {
 <body>
 
 <div class="card-container" id="card-area">
+  <!-- 🔥 WATERMARK ADDED HERE -->
+  <div class="watermark" id="wm">CONTACT TO WEB WORLD</div>
   <img src="https://i.postimg.cc/7YcT4qT8/wedding-card1.jpg" alt="Invitation Template">
 
   <!-- Text positions px-based -->
@@ -125,11 +146,12 @@ button:disabled {
 <script>
 const payBtn = document.getElementById("payBtn");
 const downloadBtn = document.getElementById("downloadBtn");
+const watermark = document.getElementById("wm");
 
 payBtn.onclick = function() {
   var options = {
     key: "rzp_live_RcZiOkCgOaOkaW",
-    amount: 35000, // ₹350 in paise
+    amount: 100, // ₹350 in paise
     currency: "INR",
     name: "Web World",
     description: "Card Download Unlock",
@@ -144,6 +166,9 @@ payBtn.onclick = function() {
 }
 
 downloadBtn.onclick = async function() {
+  // 1️⃣ PDF se pehle watermark hide
+  watermark.classList.add("hide-watermark");
+
   const card = document.getElementById("card-area");
 
   const TARGET_WIDTH = 2480;
@@ -172,6 +197,8 @@ downloadBtn.onclick = async function() {
   );
 
   pdf.save("InvitationCard_300DPI.pdf");
+  // 2️⃣ PDF ke baad watermark wapas show
+  watermark.classList.remove("hide-watermark");
 }
 </script>
 
