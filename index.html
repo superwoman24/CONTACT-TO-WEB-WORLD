@@ -3,11 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="google-site-verification" content="cIP87lHay_vUDn9wvgFq-8A9bh6IQjMTXu4Eaod7ejI" />
   <title>CONTACT TO WEB WORLD</title>
   <link rel="icon" href="https://i.postimg.cc/DZRP5pxv/logo.png" type="image/png">
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
-  <!-- Icons (Font Awesome) -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
   <style>
@@ -15,26 +13,49 @@
     body { font-family: 'Montserrat', sans-serif; background: #f8f8fc; color: #333; }
 
     header {
-      display: flex; align-items: center; justify-content: space-between;
-      background-color: #ff6f61; color: white; padding: 10px 20px;
+      display: flex; align-items: center;
+      background-color: #ff6f61; color: white;
+      padding: 10px 20px; gap: 20px;
     }
-    header img { height: 40px; }
 
-    nav { display: flex; gap: 15px; align-items: center; }
-    nav a {
-      color: white; text-decoration: none; font-weight: 600;
-      padding: 6px 12px; border-radius: 5px; transition: 0.3s;
+    /* Left side vertical menu */
+    .left-menu {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
     }
-    nav a:hover { background: rgba(255,255,255,0.2); }
+    .left-menu a {
+      color: white;
+      text-decoration: none;
+      font-weight: 600;
+      padding: 6px 12px;
+      border-radius: 5px;
+      transition: 0.3s;
+    }
+    .left-menu a:hover { background: rgba(255,255,255,0.2); }
+
+    /* Logo + Title */
+    .logo-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .logo-title img { height: 40px; }
+    .logo-title span {
+      font-size: 1.3rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+    }
 
     .contact-icons {
-      display: flex; gap: 12px; align-items: center;
+      margin-left: auto;
+      display: flex; gap: 12px;
+      font-size: 1.3rem;
     }
-    .contact-icons a {
-      color: white; font-size: 1.3rem; transition: 0.3s;
-    }
+    .contact-icons a { color: white; transition: 0.3s; }
     .contact-icons a:hover { color: #ffe0da; }
 
+    /* Cards */
     .container { max-width: 1200px; margin: auto; padding: 30px; }
     h1 { text-align: center; margin-bottom: 25px; color: #444; }
 
@@ -56,24 +77,19 @@
     .invitation-card:hover { transform: scale(1.03); }
 
     .a4-preview {
-      width: 100%;
-      aspect-ratio: 210 / 297;
+      width: 100%; aspect-ratio: 210/297;
       background: #f0f0f0;
       border: 2px solid #ddd;
       border-radius: 8px;
       overflow: hidden;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      display: flex; align-items: center; justify-content: center;
     }
     .a4-preview img { width: 100%; height: 100%; object-fit: cover; }
 
-    .invitation-card h3 { margin: 12px 0; color: #222; font-size: 1rem; }
-
     .edit-btn {
       background: #ff6f61; color: white; border: none;
-      padding: 8px 16px; border-radius: 6px; cursor: pointer;
-      font-weight: 600; transition: background 0.3s;
+      padding: 8px 16px; border-radius: 6px;
+      cursor: pointer; font-weight: 600; transition: 0.3s;
     }
     .edit-btn:hover { background: #e55d4c; }
 
@@ -84,84 +100,81 @@
     }
 
     @media (max-width: 700px) {
-      header { flex-direction: column; align-items: flex-start; gap: 10px; }
-      nav { flex-wrap: wrap; }
-      .contact-icons { margin-top: 5px; }
+      header { flex-direction: column; align-items: flex-start; }
+      .contact-icons { margin: 10px 0; }
+      .left-menu { flex-direction: row; flex-wrap: wrap; }
     }
   </style>
 </head>
 
 <body>
   <header>
-    <img src="https://i.postimg.cc/DZRP5pxv/logo.png" alt="Logo">
+    <!-- Logo + Title -->
+    <div class="logo-title">
+      <img src="https://i.postimg.cc/DZRP5pxv/logo.png" alt="Logo">
+      <span>CONTACT TO WEB WORLD</span>
+    </div>
 
-    <nav>
-      <a href="index.html">Home</a>
-      <a href="wedding.html">Wedding</a>
-      <a href="Birthday.html">Birthday</a>
-      <a href="BabyShower.html">BabyShower</a>
-      <a href="HouseWarming.html">HouseWarming</a>
-    </nav>
-
-    <!-- 🔸 Contact icons (Right side) -->
+    <!-- Contact Icons -->
     <div class="contact-icons">
-      <a href="tel:+919359980933" title="Call Now"><i class="fa-solid fa-phone"></i></a>
-      <a href="https://wa.me/919359980933" target="_blank" title="Chat on WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
+      <a href="tel:+919359980933"><i class="fa-solid fa-phone"></i></a>
+      <a href="https://wa.me/919359980933" target="_blank"><i class="fa-brands fa-whatsapp"></i></a>
     </div>
   </header>
 
+  <!-- Sidebar Menu in Body -->
+  <div class="left-menu" style="position: fixed; left: 0; top: 70px; padding: 20px; background:#ff6f61; height:100%; width:180px;">
+      <a href="index.html">Home</a>
+      <a href="wedding.html">Wedding</a>
+      <a href="birthday.html">Birthday</a>
+      <a href="babyshower.html">BabyShower</a>
+      <a href="housewarming.html">HouseWarming</a>
+  </div>
+
+    <!-- Contact Icons -->
+    <div class="contact-icons">
+      <a href="tel:+919359980933"><i class="fa-solid fa-phone"></i></a>
+      <a href="https://wa.me/919359980933" target="_blank"><i class="fa-brands fa-whatsapp"></i></a>
+    </div>
+
   <div class="container">
     <h1>Choose Your Invitation Type</h1>
-    <div class="card-grid">
 
+    <div class="card-grid">
       <div class="invitation-card">
-        <div class="a4-preview">
-          <img src="https://i.imgur.com/NMcwMc7.jpeg" alt="Wedding Invitation">
-        </div>
+        <div class="a4-preview"><img src="https://i.imgur.com/NMcwMc7.jpeg" alt="Wedding"></div>
         <h3>Wedding Invitations</h3>
         <button class="edit-btn" onclick="location.href='wedding.html'">View</button>
       </div>
 
       <div class="invitation-card">
-        <div class="a4-preview">
-          <img src="https://i.imgur.com/ulZv5NN.jpeg" alt="Birthday Invitation">
-        </div>
+        <div class="a4-preview"><img src="https://i.imgur.com/ulZv5NN.jpeg" alt="Birthday"></div>
         <h3>Birthday Invitations</h3>
         <button class="edit-btn" onclick="location.href='birthday.html'">View</button>
       </div>
 
       <div class="invitation-card">
-        <div class="a4-preview">
-          <img src="https://i.imgur.com/ovQ1IyW.jpeg" alt="Baby Shower Invitation">
-        </div>
+        <div class="a4-preview"><img src="https://i.imgur.com/ovQ1IyW.jpeg" alt="Baby Shower"></div>
         <h3>Baby Shower Invitations</h3>
         <button class="edit-btn" onclick="location.href='babyshower.html'">View</button>
       </div>
 
       <div class="invitation-card">
-        <div class="a4-preview">
-          <img src="https://i.imgur.com/qokGmKo.jpeg" alt="Housewarming Invitation">
-        </div>
+        <div class="a4-preview"><img src="https://i.imgur.com/qokGmKo.jpeg" alt="Housewarming"></div>
         <h3>House Warming Invitations</h3>
         <button class="edit-btn" onclick="location.href='housewarming.html'">View</button>
       </div>
 
       <div class="invitation-card">
-        <div class="a4-preview">
-          <img src="https://i.imgur.com/V0Z8v7M.png" alt="Other Invitation">
-        </div>
+        <div class="a4-preview"><img src="https://i.imgur.com/V0Z8v7M.png" alt="Other"></div>
         <h3>Other Invitations</h3>
         <button class="edit-btn" onclick="location.href='other.html'">View</button>
       </div>
-
     </div>
   </div>
 
   <footer>
-    © 2025 Invitation World | Designed by Puja
+    © 2025 Invitation World | Designed by CONTACT TO WEB WORLD
   </footer>
 </body>
 </html>
-
-
-
