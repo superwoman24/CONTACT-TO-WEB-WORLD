@@ -18,23 +18,22 @@
       padding: 10px 20px; gap: 20px;
     }
 
-    /* Left side vertical menu */
-    .left-menu {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-    .left-menu a {
-      color: white;
-      text-decoration: none;
-      font-weight: 600;
-      padding: 6px 12px;
-      border-radius: 5px;
-      transition: 0.3s;
-    }
-    .left-menu a:hover { background: rgba(255,255,255,0.2); }
+#sidebarMenu a {
+  display: block;
+  color: white;
+  text-decoration: none;
+  font-weight: 600;
+  padding: 10px 12px;
+  margin-bottom: 8px;
+  border-radius: 6px;
+  background: rgba(255,255,255,0.15);
+  transition: 0.3s;
+}
+#sidebarMenu a:hover {
+  background: rgba(255,255,255,0.3);
+  transform: translateX(5px);
+}
 
-    /* Logo + Title */
     .logo-title {
       display: flex;
       align-items: center;
@@ -55,7 +54,6 @@
     .contact-icons a { color: white; transition: 0.3s; }
     .contact-icons a:hover { color: #ffe0da; }
 
-    /* Cards */
     .container { max-width: 1200px; margin: auto; padding: 30px; }
     h1 { text-align: center; margin-bottom: 25px; color: #444; }
 
@@ -102,40 +100,46 @@
     @media (max-width: 700px) {
       header { flex-direction: column; align-items: flex-start; }
       .contact-icons { margin: 10px 0; }
-      .left-menu { flex-direction: row; flex-wrap: wrap; }
     }
   </style>
 </head>
 
 <body>
   <header>
-    <!-- Logo + Title -->
     <div class="logo-title">
       <img src="https://i.postimg.cc/DZRP5pxv/logo.png" alt="Logo">
       <span>CONTACT TO WEB WORLD</span>
     </div>
 
-    <!-- Contact Icons -->
     <div class="contact-icons">
       <a href="tel:+919359980933"><i class="fa-solid fa-phone"></i></a>
       <a href="https://wa.me/919359980933" target="_blank"><i class="fa-brands fa-whatsapp"></i></a>
     </div>
   </header>
 
-  <!-- Sidebar Menu in Body -->
-  <div class="left-menu" style="position: fixed; left: 0; top: 70px; padding: 20px; background:#ff6f61; height:100%; width:180px;">
-      <a href="index.html">Home</a>
-      <a href="wedding.html">Wedding</a>
-      <a href="birthday.html">Birthday</a>
-      <a href="babyshower.html">BabyShower</a>
-      <a href="housewarming.html">HouseWarming</a>
-  </div>
+<button id="menuBtn" style="position: fixed; right: 10px; top: 80px; background:#ff6f61; color:white; border:none; padding:10px 14px; border-radius:6px; cursor:pointer; z-index:999; font-size:18px;">
+  ☰ Menu
+</button>
 
-    <!-- Contact Icons -->
-    <div class="contact-icons">
-      <a href="tel:+919359980933"><i class="fa-solid fa-phone"></i></a>
-      <a href="https://wa.me/919359980933" target="_blank"><i class="fa-brands fa-whatsapp"></i></a>
-    </div>
+<div id="sidebarMenu" style="position: fixed; left: -180px; top: 70px; padding: 20px; background:#ff6f61; height:100%; width:160px; overflow-y: scroll; transition: 0.3s;">
+  <a href="index.html">Home</a>
+  <a href="wedding.html">Wedding</a>
+  <a href="birthday.html">Birthday</a>
+  <a href="babyshower.html">BabyShower</a>
+  <a href="housewarming.html">HouseWarming</a>
+</div>
+
+<script>
+  const btn = document.getElementById('menuBtn');
+  const menu = document.getElementById('sidebarMenu');
+  let open = false;
+
+  btn.onclick = () => {
+    open = !open;
+    menu.style.left = open ? '0px' : '-180px';
+    btn.style.display = open ? 'none' : 'block';
+  };
+</script>
 
   <div class="container">
     <h1>Choose Your Invitation Type</h1>
