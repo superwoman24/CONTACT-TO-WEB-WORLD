@@ -123,42 +123,73 @@ const payBtn = document.getElementById("payBtn");
 const downloadBtn = document.getElementById("downloadBtn");
 const watermark = document.getElementById("wm");
 
-// 🔥 Yaha apna Render backend URL daalein
-const BACKEND_URL = "https://contact-to-web-world-2.onrender.com"; 
+/* ⚠️ यहाँ अपना वास्तविक backend URL डालो */
+const BACKEND_URL = "https://your-backend-url.com";
 
-// ---------------- PAYMENT (Python Backend) ----------------
+/* -------------------- PAYMENT PROCESS -------------------- */
+
 payBtn.onclick = async function () {
+  try {
+    // 1️⃣ Razorpay order create from backend
+    const orderResponse = await fetch(`${BACKEND_URL}/create-order`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ amount: 200 })  // ₹200 order
+    });
 
-  // 1️⃣ BACKEND SE ORDER CREATE
-  const res = await fetch(`${BACKEND_URL}/create-order`, { method: "POST" });
-  const order = await res.json();
+    if (!orderResponse.ok) {
+      alert("Order create failed.");
+      return;
+    }
 
-  var options = {
-    key: order.key, 
-    amount: order.amount,
-    currency: "INR",
-    name: "Web World",
-    description: "Card Download Unlock",
-    order_id: order.order_id,
+    const order = await orderResponse.json();
 
-    handler: function () {
-      alert("Payment successful! Download unlocked.");
-      downloadBtn.disabled = false;
-    },
+    /* ---------------- Razorpay Checkout ---------------- */
+    const options = {
+      key: order.key_id,                       // backend से सुरक्षित आया Key ID
+      amount: order.amount,                    // in paise
+      currency: "INR",
+      name: "Web World",
+      description: "Invitation Card Payment",
+      order_id: order.id,                      // Razorpay Order ID
+      theme: { color: "#ff4da6" },
 
-    theme: { color: "#ff4da6" }
-  };
+      handler: async function (paymentInfo) {
+        // 2️⃣ Payment verify from backend
+        const verifyResponse = await fetch(`${BACKEND_URL}/verify-payment`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(paymentInfo)
+        });
 
-  var rzp = new Razorpay(options);
-  rzp.open();
+        const verifyResult = await verifyResponse.json();
+
+        if (verifyResult.success) {
+          alert("Payment Verified! Download Unlocked.");
+          downloadBtn.disabled = false;
+        } else {
+          alert("Payment verification failed.");
+        }
+      }
+    };
+
+    const rzp = new Razorpay(options);
+    rzp.open();
+
+  } catch (error) {
+    console.error(error);
+    alert("Payment process failed.");
+  }
 };
 
-// ---------------- PDF DOWNLOAD ----------------
+/* -------------------- PDF DOWNLOAD -------------------- */
+
 downloadBtn.onclick = async function () {
   watermark.classList.add("hide-watermark");
 
   const cardArea = document.getElementById("card-area");
   const canvas = await html2canvas(cardArea, { useCORS: true, scale: 2 });
+
   const imgData = canvas.toDataURL("image/png");
   const pdf = new jspdf.jsPDF("p", "mm", "a4");
   const width = pdf.internal.pageSize.getWidth();
@@ -173,4 +204,3 @@ downloadBtn.onclick = async function () {
 
 </body>
 </html>
-
